@@ -3,6 +3,7 @@ using System;
 // deals with graphics like color and such
 using System.Drawing;
 using System.Windows.Forms;
+using System.Text.RegularExpressions; //check ifalpha
 
 // it's an inheritance class because of the colon
 // the class inherits everything Form has which comes from System.Windows.Forms
@@ -86,16 +87,59 @@ public class Metric : Form
            Event data (extract data about the event, derived from EventArgs).
     */
     protected void computeClick(Object sender, EventArgs events) {
-        inputtedInches = 0.0;
         // first you need to read what the user inputted from the UI
         // The inputted data is stored in .Text since a textbox is just:
         // “a rectangle on the screen that accepts keyboard input”
+
+        // need to check if its valid or not
+        // [0-9]* means that the text must ONLY contain digits
+        // it also means that the string can be empty because of *
+
+        // fails because it wont accept periods or negs
+        // Regex.IsMatch(inches.Text, "^[0-9]*$")
+        // https://www.regexpal.com/
+        // ^-?[0-9]*(\.?)$
+        // find out if ther period matter for doubles
+
+        if (Regex.IsMatch(inches.Text, "^-?[0-9]*$") == true) {
+            Regex.IsMatch(inches.Text, "^-?(?=[0-9]*)(?=[^.]*\.[^.])(?=[^-]*-?[^-]*)$");
+            Regex.IsMatch(inches.Text, "^-?(?=[0-9]*)$");
+            // pattern that must include ONLY one period
+            /* ^ (start of str) and $ (end of str) make sure it covers the whole string
+               [^x] means any character except x
+               *\x means theres only 1 x
+               [^x]* means any character except x after the first x
+            */
+            string mustIncludeDot = @"^[^.]*\.[^.]*$";
+
+            // pattern that can ONLY include 0 or 1 negative signs
+            /* [^x] means any character except x
+               *x? means theres exatcly 0 or 1 x
+               [^x]* means zero or more characters (except x) after the optional x
+            */
+            string ifNeg = @"^[^-]*-?[^-]*$";
+            // check if the neg is at the start
+
+            // checking if the str has only 1 period and 0/1 negative signs
+            if ((Regex.IsMatch(inches.Text, mustIncludeDot) == false) || (Regex.IsMatch(inches.Text, ifNeg) == false)) {
+                midText.Text = "Invalid input. Please try again";
+                return;
+            }
+        } else {
+            midText.Text = "Invalid input. Please try again";
+            return;
+        }
+
+        inputtedInches = 0.0;
         if (inches.Text == "") {
             inputtedInches = 0.0;
         } else {
             // converts the string to a double
             inputtedInches += Double.Parse(inches.Text);
-            midText.Text += MetricConversion(inputtedInches);
+            // create a diff class because reasons???? idk but its calling the class and the function
+            midText.Text = "The metric value is: ";
+            // dont need to convert to a string since C# automatically calls ToString() when using the +
+            midText.Text += MetricLogic.metricConversion(inputtedInches) + " meters.";
             System.Console.WriteLine("The conversion is {0} meters.", midText.Text);
         }
     }
