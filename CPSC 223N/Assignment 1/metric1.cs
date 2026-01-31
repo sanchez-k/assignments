@@ -99,7 +99,9 @@ public class Metric : Form
         // Regex.IsMatch(inches.Text, "^[0-9]*$")
         // https://www.regexpal.com/
         // ^-?[0-9]*(\.?)$
-        // find out if ther period matter for doubles
+        // plain dot gives error "."
+        // "num." gives error
+        // ".8" doesnt give an error
 
         if (Regex.IsMatch(inches.Text, "^-?[0-9]*$") == true) {
             Regex.IsMatch(inches.Text, "^-?(?=[0-9]*)(?=[^.]*\.[^.])(?=[^-]*-?[^-]*)$");
