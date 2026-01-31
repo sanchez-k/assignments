@@ -7,13 +7,19 @@ rm *.exe
 echo View the list of source files
 ls -l
 
-echo Compile metric1.cs to create the file: metric.dll
-mcs -target:library -r:System.Drawing -r:System.Windows.Forms -out:metric.dll metric1.cs
+echo Compile logic1.cs to create the file: logic1.dll
+mcs -target:library -out:logic1.dll logic1.cs
 
-echo Compile driver1.cs and link the one previously created dll file to create an executable file.
-mcs -r:System -r:System.Windows.Forms -r:metric.dll -out:metric.exe driver1.cs
+echo Compile metric1.cs to create the file: metric1.dll
+mcs -target:library -r:System.Drawing.dll -r:System.Windows.Forms.dll -r:logic1.dll -out:metric1.dll metric1.cs
 
-echo Run the Metric program.
-./metric.exe &
+echo Compile driver1.cs and link the two previously created dll files to create an executable file. 
+mcs -r:System -r:System.Windows.Forms -r:metric1.dll -out:Fibo.exe driver1.cs
+
+echo View the list of files in the current folder
+ls -l
+
+echo Run the Assignment 1 program.
+./metric1.exe
 
 echo The script has terminated.
