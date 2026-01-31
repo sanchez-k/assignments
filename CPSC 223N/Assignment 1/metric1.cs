@@ -127,4 +127,15 @@ public class Metric : Form
         midText.Text += MetricLogic.metricConversion(inputtedInches) + " meters.";
         System.Console.WriteLine("The conversion is {0} meters.", midText.Text);
     }
+
+    // it might be done
+    protected void clearClick(Object sender, EventArgs evt) {
+        inches.Text = "";
+    }
+
+    // also might be done
+    protected void exitClick(Object sender, EventArgs evt) {
+        // closes the windows instances
+        Close();
+    }
 }
