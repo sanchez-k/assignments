@@ -1,3 +1,12 @@
+/*
+    Author: Kassandra Sanchez
+    Email:  k.sanchez@csu.fullerton.edu
+    Cwid:  884962788
+    Course:  CPSC 223N
+    Assignment:  1
+    Due:  February 8, 2026
+    Program:  Imperial to Metric Converter
+*/
 // blah blah
 
 // very essential, contains the building blocks of programming like int, char, etc
