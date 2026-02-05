@@ -2,10 +2,11 @@
     Author: Kassandra Sanchez
     Email:  k.sanchez@csu.fullerton.edu
     Cwid:  884962788
-    Course:  CPSC 223N
     Assignment:  1
-    Due:  February 8, 2026
     Program:  Imperial to Metric Converter
+    Due:  February 8, 2026 @ 11:59pm
+    Course:  CPSC223N
+    Languages: C# & Bash
 */
 
 // must rewrite using statements as they only apply to the file they are written in
@@ -184,41 +185,25 @@ public class Metric : Form
         // first you need to read what the user inputted from the UI
         // The inputted data is stored in .Text since a textbox is just:
         // “a rectangle on the screen that accepts keyboard input”
-
-        // need to check if its valid or not
-        // [0-9]* means that the text must ONLY contain digits
-        // it also means that the string can be empty because of *
-
-        // fails because it wont accept periods or negs
-        // Regex.IsMatch(inches.Text, "^[0-9]*$")
-        // https://www.regexpal.com/
-        // ^-?[0-9]*(\.?)$
-        // plain dot gives error "."
-        // "num." gives error
-        // ".8" doesnt give an error
-        // (?!.\*$)(-?)([^-.]*\.[^-.]*)([0-9])([^\s])
-        // ^(-?)([^-.]*\.[^-.]*)([0-9])$
         inputtedInches = 0.0;
+        int num = 0;
         
-        if (inches.Text == "") {
-            inputtedInches = 0.0;
-            // og ^(?!.*\*$)(-?)([^-.]*\.[^-.]*)([0-9])$
-        } else if (Regex.IsMatch(inches.Text, "^(?!.*\\*$)(-?)([^-.]*\\.[^-.]*)([0-9])$") == true) {
-            // check if theres whitespace and give an error
-            if (Regex.IsMatch(inches.Text, @"\s") == true) {
-                midText.Text = "Invalid input. Please try again.";
-                System.Console.WriteLine("Please only write numbers that include a decimal point.");
-                return;
-            }
-        } else {
+        // TryParse is a safe way to convert a string to a double, doesn't throw an exception if it fails
+        // If it returns a false then give error code
+        // If it doesn't the value in inches gets put into inputtedInches
+        // using regex would've made it more complicated
+        if (Double.TryParse(inches.Text, out inputtedInches) == false) {
             midText.Text = "Invalid input. Please try again.";
-            System.Console.WriteLine("Please only write numbers that include a decimal point.");
+            System.Console.WriteLine("Please only write numbers.");
+            return;
+          // checks if the number is an int
+          // TryParse takes in 2 arguments so num was needed in this case
+        } else if (int.TryParse(inches.Text, out num) == true) {
+            midText.Text = "Invalid input. Please try again.";
+            System.Console.WriteLine("The number must include a decimal point.");
             return;
         }
-
-
-        // converts the string to a double
-        inputtedInches += Double.Parse(inches.Text);
+        
         // create a diff class because reasons???? idk but its calling the class and the function
         midText.Text = "The metric value is: ";
         MetricLogic logic = new MetricLogic();
@@ -227,7 +212,7 @@ public class Metric : Form
         string meter = logic.metricConversion(inputtedInches).ToString();
         // FIX THIS
         System.Console.WriteLine("The conversion is {0} meters.", meter);
-    } // add try and catch so any errors get printed to the terminal
+    } // add try and catch so any errors get printed to the terminal, nah
 
     // it might be done
     protected void clearClick(Object sender, EventArgs evt) {
