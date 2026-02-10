@@ -20,7 +20,7 @@ echo Compile racingballui.cs to create the file: racingballui.dll
 mcs -target:library -r:System.Drawing.dll -r:System.Windows.Forms.dll -out:racingballui.dll racingballui.cs
 
 echo Compile racingball.cs and link the previously created dll file to create an executable file. 
-mcs -r:System -r:System.Windows.Forms -r:racingballui.dll -out:racingballui.exe racingballui.cs
+mcs -r:System -r:System.Windows.Forms -r:racingballui.dll -out:racingball.exe racingball.cs
 
 echo View the list of files in the current folder
 ls -l
