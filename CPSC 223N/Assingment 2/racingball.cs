@@ -17,6 +17,6 @@ public class RacingBallMain {
         System.Console.WriteLine("Welcome to the Main method of the Racing Ball program.");
         RacingBall userinterface = new RacingBall();
         Application.Run(userinterface);
-        System.Console.WriteLine("blub");
+        System.Console.WriteLine("Thank you for using the Racing Ball program!");
     }
 }
