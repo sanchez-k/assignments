@@ -29,11 +29,65 @@ public class RacingBall : Form {
     private Button exit = new Button();
 
     private Panel titlePanel = new Panel();
-    private Panel ballPanel = new Panel();
     private Panel buttonPanel = new Panel();
 
+    ////////////////////////////////////////////////////////////////////////////////////
+
+    // new stuff, most of it comes from the 90 Degree program
+    private GraphicPanel ballPanel = new GraphicPanel();
+    // the points where the ball will travel
+    private static Point v1;
+    private static Point v2;
+    private static Point v3;
+    private static Point v4;
+
+    // 24.8 Hertz means the screen will refresh 24.8 times per second (~25 FPS)
+    // So it controls how often the UI redraws and how smooth the animation looks
+    private const double refreshClockRate = 24.8;  //Hertz = tics per second
+    // Controls how many times per second the ball's position updates, which is 57.3 time per sec
+    private const double motionClockRate = 57.3;   //Hertz = tics per second
+    // The speed of the ball, so how often it moves
+    private const double ballLinearSpeed = 98.3;   //pixel per second
+
+    // declares how big the ball will be
+    private static double ballRadius = 8.65;
+    // half of the current center coordinates of the ball
+    private static double ballCenterX;
+    // same thing above, just the other half
+    private static double ballCenterY;
+    // position of the corner to draw the circle on the UI??
+    private static double ballCornerX;
+    private static double ballCornerY;
+    // how much the ball moves in X and Y per clock tick
+    private static double horizontalMovement;
+    private static double verticalMovement;
+    // how many pixels the ball should move in one tick, regardless of direction
+    private static double pixelPerTick;
+
+    // Clock stuff
+    // Keeps track of where the ball is moving
+    // enum lets you create a new data type, inside the {} are the values that Compass has
+    enum Compass {North, West, South, East};
+    // Creating a variable of type Compass, it's set to west meaning that's where it'll move
+    Compass currDirection = Compass.West;
+    // how often the ball updates its postion in milliseconds
+    private int ballClockInterval = (int)System.Math.Round(1000.0/motionClockRate);
+    // the actual timer object that will tick at whatever interval i put
+    private static System.Timers.Timer ballClock = new System.Timers.Timer();
+
+    // the second clock
+    //Declare the refresh clock.
+    // calculates how often the screen should refresh, in milliseconds
+    private int refreshClockInterval = (int)System.Math.Round(1000.0/refreshClockRate);
+    // another timer that redraws the UI, makes it seem like the ball is moving
+    private static System.Timers.Timer uiRefreshClock = new System.Timers.Timer();
+
+    // helpers
+    private bool bothClocksStopped = true;
+    private int ticCount = 0;
+
     public RacingBall() {
-        // UI configuration 
+        // UI size configuration 
         // This is another way to prevent the user to resize the window
         FormBorderStyle = FormBorderStyle.FixedSingle;
         MaximizeBox = false;
@@ -92,6 +146,39 @@ public class RacingBall : Form {
         Controls.Add(titlePanel);
         Controls.Add(ballPanel);
         Controls.Add(buttonPanel);
+
+        ////////////////////////////////////////////////////////////////////////////////////
+        
+        // Setting up the new stuff minus the ballPanel
+
+        // This sets up the path where the ball will travel
+        v1 = new Point(ballPanel.Width-30,30);
+        v2 = new Point(30,30);
+        v3 = new Point(30,ballPanel.Height-30);
+        v4 = new Point(ballPanel.Width-30,ballPanel.Height-30);
+
+        // the balls starting location
+        ballCenterX = v1.X;
+        ballCenterY = v1.Y;
+
+        //Prepare the refresh clock.  A button will start this clock ticking.
+        uiRefreshClock.Enabled = false;  //Initially this clock is stopped.
+        uiRefrshuiRefreshClockClock.Interval = refreshClockInterval;
+        // idk
+        uiRefreshClock.Elapsed += new ElapsedEventHandler(refreshUI);
+
+        //Prepare the ball clock.  A button will start this clock ticking.
+        ballClock.Enabled = false;  //Initially this clock is stopped.
+        ballClock.Interval = ballClockInterval;
+        // idk if i need this
+        ballClock.Elapsed += new ElapsedEventHandler(updateBallCoords);
+
+        //Change units of speed of ball
+        pixelPerTick = ballLinearSpeed/motionClockRate;  //pixels per tic.
+
+        //Set the values for Δx and Δy for initial direction "West".
+        horizontalMovement = - pixelPerTick;
+        verticalMovement = 0.0;
     }
 
     protected void goClick(Object sender, EventArgs events) {
@@ -103,4 +190,14 @@ public class RacingBall : Form {
         // maybe make it wait a sec
         Close();
     }
+
+    //
+    // updateBallCoords
+
+    // refreshUI
+
+    public class GraphicPanel : Panel {
+        //
+    }
+
 }
