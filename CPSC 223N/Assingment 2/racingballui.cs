@@ -196,8 +196,22 @@ public class RacingBall : Form {
 
     // refreshUI
 
+    // this actually draws the stuff, we're inheriting from the Panel class
+    // but there'll be some custom drawing behavior
     public class GraphicPanel : Panel {
-        //
+        // Pen is used to draw lines, the line thickness will be 2 pixels
+        private Pen coloring = new Pen(Color.Red, 2);
+        // this will run each time the panel is redrawn so when the refresh clock triggers a redraw
+        // we're overriding the default drawing behavior
+        protected override void onPaint(PaintEventArgs artsy) {
+            // Graphics is the canvas and artsy.Graphics lets you draw on it
+            Graphics graph = artsy.Graphics;
+            // these will draw the rectangle OUR race track
+            graph.DrawLine(coloring, v1.X, v1.Y, v2.X, v2.Y);
+            graph.DrawLine(coloring, v2.X, v2.Y, v3.X, v3.Y);
+            graph.DrawLine(coloring, v3.X, v3.Y, v4.X, v4.Y);
+            graph.DrawLine(coloring, v4.X, v4.Y, v1.X, v1.Y);
+        }
     }
 
 }
