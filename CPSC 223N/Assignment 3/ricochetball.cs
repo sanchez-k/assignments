@@ -7,7 +7,8 @@
     Due:  March 8, 2026 @ 11:59pm
     Course:  CPSC223N
     Languages: C# & Bash
-    Purpose: 
+    Purpose: To animate a ball that ricochets off of a wall. It's speed and direction 
+    of the ball is determined by the user's input.
 */
 
 using System;
