@@ -23,7 +23,7 @@ public class RicochetBall : Form {
     // How big the title panel will be
     private const int titleHeight = 80;
     // How big the ball panel will be
-    private const int ballHeight = 760;
+    private const int ballHeight = 700;
     // Doing this makes it easier to read and recalculate, if the UI's size gets changed
     // Also no hard coding
     private const int buttonHeight = formHeight - titleHeight - ballHeight;
@@ -93,6 +93,9 @@ public class RicochetBall : Form {
     // Nums for both clocks should be diff because it can create a timing artifact
     private const double uiRefreshRate = 60.3;  //Units are Hz = #refreshes per second
 
+    private int objMargin = 40;
+    private int tinyMargin = 10;
+
     public RicochetBall() {
         // Setting up the UI
         Text = "Ricochet Ball";
@@ -102,84 +105,7 @@ public class RicochetBall : Form {
         Size = new Size(formWidth, formHeight);
         CenterToScreen();
 
-        // Setting the data for the labels
-        // hardcoding the size man
-        title.Size = new Size(610, 50);
-        title.Location = new Point((formWidth - title.Width) / 2, (titleHeight / 2) - (title.Height / 2));
-        title.Text = "Ricochet Ball by Kassandra Sanchez";
-        title.TextAlign = ContentAlignment.MiddleCenter;
-        title.Font = new Font("Georgia", 25, FontStyle.Bold);
-        title.BackColor = ColorTranslator.FromHtml("#C3B1E1");
-        Controls.Add(title);
-
-        speed.Size = new Size(370, 45);
-        // im gonna crash out, how tf do you position this????
-        speed.Location = new Point(enterSpeed.Location.X - speed.Width, titleHeight + ballHeight + 15);
-        speed.Text = "Enter Speed (pixel/second)";
-        speed.TextAlign = ContentAlignment.MiddleCenter;
-        speed.Font = new Font("Georgia", 20, FontStyle.Bold);
-        speed.BackColor = ColorTranslator.FromHtml("#F54927");
-        Controls.Add(speed);
-
-        direction.Size = new Size(350, 45);
-        // variables wouldve helped
-        direction.Location = new Point(this.ClientSize.Width - enterDirection.Width - direction.Width - 150, titleHeight + ballHeight + 15);
-        direction.Text = "Enter Direction (degrees)";
-        direction.TextAlign = ContentAlignment.MiddleCenter;
-        direction.Font = new Font("Georgia", 20, FontStyle.Bold);
-        direction.BackColor = ColorTranslator.FromHtml("#F54927");
-        Controls.Add(direction);
-
-        coords.Size = new Size(200, 45);
-        coords.Location = new Point(60, 60);
-        coords.Text = "Coordinates of the center of the ball";
-        coords.Font = new Font("Georgia", 20, FontStyle.Bold);
-        coords.BackColor = ColorTranslator.FromHtml("#F54927");
-        Controls.Add(coords);
-
-        xCoords.Size = new Size(200, 45);
-        xCoords.Location = new Point(60, 60);
-        xCoords.Text = "X =";
-        xCoords.Font = new Font("Georgia", 20, FontStyle.Bold);
-        xCoords.BackColor = ColorTranslator.FromHtml("#F54927");
-        Controls.Add(xCoords);
-
-        yCoords.Size = new Size(200, 45);
-        yCoords.Location = new Point(60, 60);
-        yCoords.Text = "Y =";
-        yCoords.Font = new Font("Georgia", 20, FontStyle.Bold);
-        yCoords.BackColor = ColorTranslator.FromHtml("#F54927");
-        Controls.Add(yCoords);
-        // ദി(ᴗ _ᴗ ദി)
-
-
-        // Setting up the textboxes
-        enterSpeed.Size = new Size(200, 45);
-        enterSpeed.Location = new Point(this.ClientSize.Width - enterDirection.Width - direction.Width - enterSpeed.Width - 190, titleHeight + ballHeight + 15);
-        enterSpeed.Text = "";
-        enterSpeed.Font = new Font("Georgia", 20, FontStyle.Regular);
-        Controls.Add(enterSpeed);
-
-        enterDirection.Size = new Size(200, 45);
-        enterDirection.Location = new Point(this.ClientSize.Width - enterDirection.Width - 40, titleHeight + ballHeight + 15);
-        enterDirection.Text = "";
-        enterDirection.Font = new Font("Georgia", 20, FontStyle.Regular);
-        Controls.Add(enterDirection);
-
-        enterXCoords.Size = new Size(200, 45);
-        enterXCoords.Location = new Point(60, 60);
-        enterXCoords.Text = "";
-        enterXCoords.Font = new Font("Georgia", 20, FontStyle.Regular);
-        Controls.Add(enterXCoords);
-
-        enterYCoords.Size = new Size(200, 45);
-        enterYCoords.Location = new Point(60, 60);
-        enterYCoords.Text = "";
-        enterYCoords.Font = new Font("Georgia", 20, FontStyle.Regular);
-        Controls.Add(enterYCoords);
-        // ദ്ദി ˉ͈̀꒳ˉ͈́ )✧
-
-
+        // order matters, since the other stuff depends on the position of the buttons, they go first
         // Setting up the buttons
         initial.Size = new Size(200, 45);
         initial.Location = new Point(40, titleHeight + ballHeight + 15);
@@ -191,7 +117,6 @@ public class RicochetBall : Form {
         //initial.Click += new EventHandler(initClick);
         Controls.Add(initial);
         
-
         start.Size = new Size(200, 45);
         // ClientSize is the actual size of the UI, it doesnt include the title bar & borders
         // button.Height gives me the y coord, which is 40
@@ -206,7 +131,8 @@ public class RicochetBall : Form {
 
         quit.Size = new Size(200, 45);
         // x coords math makes sure that theres a 40 pixel margin
-        quit.Location = new Point(this.ClientSize.Width - quit.Width - 40, this.ClientSize.Height - quit.Height - 15);
+        // start.Top uses start's Y value
+        quit.Location = new Point(this.ClientSize.Width - quit.Width - 40, start.Top);
         quit.Text = "Quit";
         quit.TextAlign = ContentAlignment.MiddleCenter;
         quit.Font = new Font("Georgia", 20, FontStyle.Bold);
@@ -215,6 +141,89 @@ public class RicochetBall : Form {
         //quit.Click += new EventHandler(quitClick);
         Controls.Add(quit);
         // ✧ദ്ദി( ˶^ᗜ^˶ )
+
+
+        // hardcoding the size man, smh
+        title.Size = new Size(610, 50);
+        title.Location = new Point((formWidth - title.Width) / 2, (titleHeight / 2) - (title.Height / 2));
+        title.Text = "Ricochet Ball by Kassandra Sanchez";
+        title.TextAlign = ContentAlignment.MiddleCenter;
+        title.Font = new Font("Georgia", 25, FontStyle.Bold);
+        title.BackColor = ColorTranslator.FromHtml("#C3B1E1");
+        Controls.Add(title);
+        // ദ്ദി ˉ͈̀꒳ˉ͈́ )✧
+
+
+        // Now the rest of the labels & textboxes
+        enterDirection.Size = new Size(200, 45);
+        enterDirection.Location = new Point(quit.Left, initial.Top);
+        enterDirection.Text = "";
+        enterDirection.Font = new Font("Georgia", 20, FontStyle.Regular);
+        Controls.Add(enterDirection);
+
+        direction.Size = new Size(350, 45);
+        direction.Location = new Point(enterDirection.Left - direction.Width - tinyMargin, initial.Top);
+        direction.Text = "Enter Direction (degrees)";
+        direction.TextAlign = ContentAlignment.MiddleCenter;
+        direction.Font = new Font("Georgia", 20, FontStyle.Bold);
+        direction.BackColor = ColorTranslator.FromHtml("#CF8969");
+        Controls.Add(direction);
+
+
+        enterSpeed.Size = new Size(200, 45);
+        enterSpeed.Location = new Point(this.direction.Left - enterSpeed.Width - objMargin, initial.Top);
+        enterSpeed.Text = "";
+        enterSpeed.Font = new Font("Georgia", 20, FontStyle.Regular);
+        Controls.Add(enterSpeed);
+
+        speed.Size = new Size(370, 45);
+        speed.Location = new Point(enterSpeed.Left - speed.Width - tinyMargin, initial.Top);
+        speed.Text = "Enter Speed (pixel/second)";
+        speed.TextAlign = ContentAlignment.MiddleCenter;
+        speed.Font = new Font("Georgia", 20, FontStyle.Bold);
+        speed.BackColor = ColorTranslator.FromHtml("#CF8969");
+        Controls.Add(speed);
+
+
+        enterYCoords.Size = new Size(200, 45);
+        // quit.Left uses quit's X value, the math also makes sure there's a 40 pixel margin
+        enterYCoords.Location = new Point(quit.Left - enterYCoords.Width - objMargin, quit.Top);
+        enterYCoords.Text = "";
+        enterYCoords.Font = new Font("Georgia", 20, FontStyle.Regular);
+        Controls.Add(enterYCoords);
+
+        yCoords.Size = new Size(50, 45);
+        yCoords.Location = new Point(enterYCoords.Left - yCoords.Width - tinyMargin, quit.Top);
+        yCoords.Text = "Y = ";
+        yCoords.TextAlign = ContentAlignment.MiddleCenter;
+        yCoords.Font = new Font("Georgia", 20, FontStyle.Bold);
+        yCoords.BackColor = ColorTranslator.FromHtml("#CF8969");
+        Controls.Add(yCoords);
+
+
+        enterXCoords.Size = new Size(200, 45);
+        enterXCoords.Location = new Point(yCoords.Left - enterXCoords.Width - objMargin, quit.Top);
+        enterXCoords.Text = "";
+        enterXCoords.Font = new Font("Georgia", 20, FontStyle.Regular);
+        Controls.Add(enterXCoords);
+
+        xCoords.Size = new Size(50, 45);
+        xCoords.Location = new Point(enterXCoords.Left - xCoords.Width - tinyMargin, quit.Top);
+        xCoords.Text = "X = ";
+        xCoords.TextAlign = ContentAlignment.MiddleCenter;
+        xCoords.Font = new Font("Georgia", 20, FontStyle.Bold);
+        xCoords.BackColor = ColorTranslator.FromHtml("#CF8969");
+        Controls.Add(xCoords);
+
+
+        coords.Size = new Size(500, 45);
+        coords.Location = new Point(enterYCoords.Right + (xCoords.Left - enterYCoords.Right - coords.Width) / 2, (quit.Top + initial.Top) / 2);
+        coords.Text = "Coordinates of the center of the ball";
+        coords.TextAlign = ContentAlignment.MiddleCenter;
+        coords.Font = new Font("Georgia", 20, FontStyle.Bold);
+        coords.BackColor = ColorTranslator.FromHtml("#CF8969");
+        Controls.Add(coords);
+        // ദി(ᴗ _ᴗ ദി)
 
 
         // Setting up the panels
@@ -259,6 +268,10 @@ public class RicochetBall : Form {
     }
 }
 
-// size, location, backcolor
+// backcolor
+
+// fix location of coords
+
 
 // #CF69B8
+// 69CFA1
