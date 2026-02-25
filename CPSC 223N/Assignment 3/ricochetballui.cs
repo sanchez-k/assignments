@@ -48,7 +48,7 @@ public class RicochetBall : Form {
     private Panel titlePanel = new Panel();
     private Panel buttonPanel = new Panel();
 
-    private GraphicPanel ballPanel = new Graphic();
+    private GraphicPanel ballPanel = new GraphicPanel();
 
     ////////////////////////////////////////////////////////////////////////////////////
     
@@ -70,16 +70,15 @@ public class RicochetBall : Form {
     private double ballDeltaX;
     private double ballDeltaY;
 
-    // Where the ball is initially drawn, the (double) converts the int to a double
-    private const double ballCenterInitialCoordsX = (double)formWidth * 0.65;
-    private const double ballCenterInitialCoordsY = (double)ballHeight / 2.0 + titleHeight;
+    // Where the ball is initially drawn, it's going to be in the center
+    private static double ballCenterInitialCoordsX = formWidth / 2;
+    private static double ballCenterInitialCoordsY = ballHeight / 2;
 
     // This helps to perfectly draw a circle
     private double ballCenterCurrCoordsX;
     private double ballCenterCurrCoordsY;
-    private double ballUpperLeftCurrCoordsX;
-    private double ballUpperLeftCurrCoordsY;
-
+    private static double ballUpperLeftCurrCoordsX;
+    private static double ballUpperLeftCurrCoordsY;
 
     // Declaring data about the clocks
     // Creates a timer object
@@ -105,123 +104,161 @@ public class RicochetBall : Form {
 
         // Setting the data for the labels
         // hardcoding the size man
-        title.Size = new Size(510, 40);
+        title.Size = new Size(610, 50);
         title.Location = new Point((formWidth - title.Width) / 2, (titleHeight / 2) - (title.Height / 2));
         title.Text = "Ricochet Ball by Kassandra Sanchez";
+        title.TextAlign = ContentAlignment.MiddleCenter;
         title.Font = new Font("Georgia", 25, FontStyle.Bold);
-        title.BackColor = ColorTranslator.FromHtml("#FCFC");
+        title.BackColor = ColorTranslator.FromHtml("#C3B1E1");
         Controls.Add(title);
 
-        speed.Size = new Size(510, 40);
-        speed.Location = new Point(60, 60);
+        speed.Size = new Size(370, 45);
+        // im gonna crash out, how tf do you position this????
+        speed.Location = new Point(enterSpeed.Location.X - speed.Width, titleHeight + ballHeight + 15);
         speed.Text = "Enter Speed (pixel/second)";
+        speed.TextAlign = ContentAlignment.MiddleCenter;
         speed.Font = new Font("Georgia", 20, FontStyle.Bold);
-        speed.BackColor = ColorTranslator.FromHtml("#FCFC");
+        speed.BackColor = ColorTranslator.FromHtml("#F54927");
         Controls.Add(speed);
 
-        direction.Size = new Size(510, 40);
-        direction.Location = new Point(60, 60);
+        direction.Size = new Size(350, 45);
+        // variables wouldve helped
+        direction.Location = new Point(this.ClientSize.Width - enterDirection.Width - direction.Width - 150, titleHeight + ballHeight + 15);
         direction.Text = "Enter Direction (degrees)";
+        direction.TextAlign = ContentAlignment.MiddleCenter;
         direction.Font = new Font("Georgia", 20, FontStyle.Bold);
-        direction.BackColor = ColorTranslator.FromHtml("#FCFC");
+        direction.BackColor = ColorTranslator.FromHtml("#F54927");
         Controls.Add(direction);
 
-        coords.Size = new Size(510, 40);
+        coords.Size = new Size(200, 45);
         coords.Location = new Point(60, 60);
         coords.Text = "Coordinates of the center of the ball";
         coords.Font = new Font("Georgia", 20, FontStyle.Bold);
-        coords.BackColor = ColorTranslator.FromHtml("#FCFC");
+        coords.BackColor = ColorTranslator.FromHtml("#F54927");
         Controls.Add(coords);
 
-        xCoords.Size = new Size(510, 40);
+        xCoords.Size = new Size(200, 45);
         xCoords.Location = new Point(60, 60);
         xCoords.Text = "X =";
         xCoords.Font = new Font("Georgia", 20, FontStyle.Bold);
-        xCoords.BackColor = ColorTranslator.FromHtml("#FCFC");
+        xCoords.BackColor = ColorTranslator.FromHtml("#F54927");
         Controls.Add(xCoords);
 
-        yCoords.Size = new Size(510, 40);
+        yCoords.Size = new Size(200, 45);
         yCoords.Location = new Point(60, 60);
         yCoords.Text = "Y =";
         yCoords.Font = new Font("Georgia", 20, FontStyle.Bold);
-        yCoords.BackColor = ColorTranslator.FromHtml("#FCFC");
+        yCoords.BackColor = ColorTranslator.FromHtml("#F54927");
         Controls.Add(yCoords);
         // ദി(ᴗ _ᴗ ദി)
 
 
         // Setting up the textboxes
-        enterSpeed.Size = new Size(510, 40);
-        enterSpeed.Location = new Point(60, 60);
+        enterSpeed.Size = new Size(200, 45);
+        enterSpeed.Location = new Point(this.ClientSize.Width - enterDirection.Width - direction.Width - enterSpeed.Width - 190, titleHeight + ballHeight + 15);
         enterSpeed.Text = "";
         enterSpeed.Font = new Font("Georgia", 20, FontStyle.Regular);
-        enterSpeed.BackColor = ColorTranslator.FromHtml("#FCFC");
         Controls.Add(enterSpeed);
 
-        enterDirection.Size = new Size(510, 40);
-        enterDirection.Location = new Point(60, 60);
+        enterDirection.Size = new Size(200, 45);
+        enterDirection.Location = new Point(this.ClientSize.Width - enterDirection.Width - 40, titleHeight + ballHeight + 15);
         enterDirection.Text = "";
         enterDirection.Font = new Font("Georgia", 20, FontStyle.Regular);
-        enterDirection.BackColor = ColorTranslator.FromHtml("#FCFC");
         Controls.Add(enterDirection);
 
-        enterXCoords.Size = new Size(510, 40);
+        enterXCoords.Size = new Size(200, 45);
         enterXCoords.Location = new Point(60, 60);
         enterXCoords.Text = "";
         enterXCoords.Font = new Font("Georgia", 20, FontStyle.Regular);
-        enterXCoords.BackColor = ColorTranslator.FromHtml("#FCFC");
         Controls.Add(enterXCoords);
 
-        enterYCoords.Size = new Size(510, 40);
+        enterYCoords.Size = new Size(200, 45);
         enterYCoords.Location = new Point(60, 60);
         enterYCoords.Text = "";
         enterYCoords.Font = new Font("Georgia", 20, FontStyle.Regular);
-        enterYCoords.BackColor = ColorTranslator.FromHtml("#FCFC");
         Controls.Add(enterYCoords);
         // ദ്ദി ˉ͈̀꒳ˉ͈́ )✧
 
 
         // Setting up the buttons
-        initial.Size = new Size(510, 40);
-        initial.Location = new Point(60, 60);
+        initial.Size = new Size(200, 45);
+        initial.Location = new Point(40, titleHeight + ballHeight + 15);
         initial.Text = "Initial";
+        initial.TextAlign = ContentAlignment.MiddleCenter;
         initial.Font = new Font("Georgia", 20, FontStyle.Bold);
-        initial.BackColor = ColorTranslator.FromHtml("#FCFC");
+        initial.BackColor = ColorTranslator.FromHtml("#CF7669");
+        initial.Enabled = true;
+        //initial.Click += new EventHandler(initClick);
         Controls.Add(initial);
+        
 
-        start.Size = new Size(510, 40);
-        start.Location = new Point(60, 60);
+        start.Size = new Size(200, 45);
+        // ClientSize is the actual size of the UI, it doesnt include the title bar & borders
+        // button.Height gives me the y coord, which is 40
+        start.Location = new Point(40, this.ClientSize.Height - start.Height - 15);
         start.Text = "Start";
+        start.TextAlign = ContentAlignment.MiddleCenter;
         start.Font = new Font("Georgia", 20, FontStyle.Bold);
-        start.BackColor = ColorTranslator.FromHtml("#FCFC");
+        start.BackColor = ColorTranslator.FromHtml("#69CF7B");
+        start.Enabled = false;
+        //start.Click += new EventHandler(startClick);
         Controls.Add(start);
 
-        Quit.Size = new Size(510, 40);
-        Quit.Location = new Point(60, 60);
-        Quit.Text = "Quit";
-        Quit.Font = new Font("Georgia", 20, FontStyle.Bold);
-        Quit.BackColor = ColorTranslator.FromHtml("#FCFC");
-        Controls.Add(Quit);
+        quit.Size = new Size(200, 45);
+        // x coords math makes sure that theres a 40 pixel margin
+        quit.Location = new Point(this.ClientSize.Width - quit.Width - 40, this.ClientSize.Height - quit.Height - 15);
+        quit.Text = "Quit";
+        quit.TextAlign = ContentAlignment.MiddleCenter;
+        quit.Font = new Font("Georgia", 20, FontStyle.Bold);
+        quit.BackColor = ColorTranslator.FromHtml("#CF697B");
+        quit.Enabled = true;
+        //quit.Click += new EventHandler(quitClick);
+        Controls.Add(quit);
         // ✧ദ്ദി( ˶^ᗜ^˶ )
 
 
         // Setting up the panels
         titlePanel.Size = new Size(formWidth, titleHeight);
         titlePanel.Location = new Point(0, 0);
-        titlePanel.BackColor = ColorTranslator.FromHtml("#FCFC");
+        titlePanel.BackColor = ColorTranslator.FromHtml("#C3B1E1");
         Controls.Add(titlePanel);
 
         ballPanel.Size = new Size(formWidth, ballHeight);
         ballPanel.Location = new Point(0, titleHeight);
-        ballPanel.BackColor = ColorTranslator.FromHtml("#FCFC");
+        ballPanel.BackColor = ColorTranslator.FromHtml("#807594");
         Controls.Add(ballPanel);
 
         buttonPanel.Size = new Size(formWidth, buttonHeight);
         // Adding both panel heights so it's positioned below those panels
         buttonPanel.Location = new Point(0, titleHeight + ballHeight);
-        buttonPanel.BackColor = ColorTranslator.FromHtml("#FCFC");
+        buttonPanel.BackColor = ColorTranslator.FromHtml("#453F50");
         Controls.Add(buttonPanel);
         // ദ്ദി˙ ᴗ ˙ )
+    }
+
+    // prof didnt need a graphic panel since the whole UI, in ricochet ball, was drawn
+    // a graphic panel is needed if i want to confine the drawing and separate the code
+    public class GraphicPanel : Panel {
+        // maybe change the color???
+        private Color ballColor = ColorTranslator.FromHtml("#DFFF82");
+
+        protected override void OnPaint(PaintEventArgs artsy) {
+            Graphics graph = artsy.Graphics;
+
+            // Drawing the ball
+            ballUpperLeftCurrCoordsX = ballCenterInitialCoordsX - ballRadius;
+            ballUpperLeftCurrCoordsY = ballCenterInitialCoordsY - ballRadius;
+            Brush colorfulBrush = new SolidBrush(ballColor);
+            graph.FillEllipse(colorfulBrush,
+                              (int)ballUpperLeftCurrCoordsX,
+                              (int)ballUpperLeftCurrCoordsY,
+                              (float)(2.0 * ballRadius),
+                              (float)(2.0 * ballRadius));
+            base.OnPaint(artsy);
+        }
     }
 }
 
 // size, location, backcolor
+
+// #CF69B8
