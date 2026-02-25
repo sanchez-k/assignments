@@ -114,7 +114,7 @@ public class RicochetBall : Form {
         initial.Font = new Font("Georgia", 20, FontStyle.Bold);
         initial.BackColor = ColorTranslator.FromHtml("#CF7669");
         initial.Enabled = true;
-        //initial.Click += new EventHandler(initClick);
+        initial.Click += new EventHandler(initClick);
         Controls.Add(initial);
         
         start.Size = new Size(200, 45);
@@ -126,8 +126,9 @@ public class RicochetBall : Form {
         start.Font = new Font("Georgia", 20, FontStyle.Bold);
         start.BackColor = ColorTranslator.FromHtml("#69CF7B");
         start.Enabled = false;
-        //start.Click += new EventHandler(startClick);
+        start.Click += new EventHandler(startClick);
         Controls.Add(start);
+        AcceptButton = start;
 
         quit.Size = new Size(200, 45);
         // x coords math makes sure that theres a 40 pixel margin
@@ -138,8 +139,9 @@ public class RicochetBall : Form {
         quit.Font = new Font("Georgia", 20, FontStyle.Bold);
         quit.BackColor = ColorTranslator.FromHtml("#CF697B");
         quit.Enabled = true;
-        //quit.Click += new EventHandler(quitClick);
+        quit.Click += new EventHandler(quitClick);
         Controls.Add(quit);
+        CancelButton = quit;
         // ✧ദ്ദി( ˶^ᗜ^˶ )
 
 
@@ -243,6 +245,57 @@ public class RicochetBall : Form {
         buttonPanel.BackColor = ColorTranslator.FromHtml("#453F50");
         Controls.Add(buttonPanel);
         // ദ്ദി˙ ᴗ ˙ )
+
+
+        //Prepare the refresh clock.  A button will start this clock ticking.
+        uiRefreshClock.Enabled = false;
+        uiRefreshClock.Interval = uiRefreshRate;
+        uiRefreshClock.Elapsed += new ElapsedEventHandler(refreshUI);
+
+        //Prepare the ball clock.  A button will start this clock ticking.
+        ballClock.Enabled = false;  //Initially this clock is stopped.
+        ballClock.Interval = ballClockInterval;
+        ballClock.Elapsed += new ElapsedEventHandler(updateBallCoords);
+    }
+
+    protected void startClick(Object sender, EventArgs events) (
+        //
+    )
+
+    protected void initialClick(Object sender, EventArgs events) {
+        double num = 0.0;
+        // do i check for 0 or if its an int??
+
+        if (Double.TryParse(enterSpeed.Text, out num) == false ||
+            Double.TryParse(enterDirection.Text, out num) == false ||
+            Double.TryParse(enterXCoords.Text, out num) == false ||
+            Double.TryParse(enterYCoords.Text, out num) == false) {
+            System.Console.WriteLine("Please only put numbers in the textboxes.");
+            return;
+
+        } else {
+            if (enterSpeed.Text == "") {
+                enterSpeed.Text = "100";
+            }
+
+            if (enterDirection.Text == "") {
+                enterDirection.Text = "25";
+            }
+
+            if (enterXCoords.Text == "") {
+                enterXCoords.Text = "100";
+            }
+
+            if (enterYCoords.Text == "") {
+                enterYCoords.Text = "100";
+            }
+        }
+
+        //
+    }
+
+    protected void quitClick(Object sender, EventArgs events) {
+        Close();
     }
 
     // prof didnt need a graphic panel since the whole UI, in ricochet ball, was drawn
