@@ -97,6 +97,10 @@ public class RicochetBall : Form {
     private int tinyMargin = 10;
     private bool bothClocksStopped = true;
     private bool showBall = false;
+    private static double userBallSpeed = 0.0;
+    private static double userBallDirection = 0.0;
+    private static double userBallCoordX = 0.0;
+    private static double userBallCoordY = 0.0;
 
     public RicochetBall() {
         // Setting up the UI
@@ -259,6 +263,13 @@ public class RicochetBall : Form {
         ballClock.Enabled = false;  //Initially this clock is stopped.
         ballClock.Interval = ballClockRate;
         //ballClock.Elapsed += new ElapsedEventHandler(updateBallCoords);
+
+        // this hooks up any text changes to the function textFilled, kinda like a button
+        // but you write stuff in it instead
+        enterSpeed.TextChanged += textFilled;
+        enterDirection.TextChanged += textFilled;
+        enterXCoords.TextChanged += textFilled;
+        enterYCoords.TextChanged += textFilled;
     }
 
     protected void startClick(Object sender, EventArgs events) {
@@ -266,34 +277,10 @@ public class RicochetBall : Form {
         // rn the function has to check if its valid, which is repeating code
         // a helper function wouldve been nice
         double num = 0.0;
-
-        // Prefilling in the textboxes if empty
-        if (enterSpeed.Text == "") {
-            enterSpeed.Text = "100";
-        }
-        if (enterDirection.Text == "") {
-            enterDirection.Text = "25";
-        }
-        if (enterXCoords.Text == "") {
-            enterXCoords.Text = "100";
-        }
-        if (enterYCoords.Text == "") {
-            enterYCoords.Text = "100";
-        }
-
-        if (Double.TryParse(enterSpeed.Text, out num) == false ||
-            Double.TryParse(enterDirection.Text, out num) == false ||
-            Double.TryParse(enterXCoords.Text, out num) == false ||
-            Double.TryParse(enterYCoords.Text, out num) == false) {
-            System.Console.WriteLine("Please only put numbers in the textboxes.");
-            start.Enabled = false;
-            //ballPanel.displayBall(showBall);
-            return;
-        }
-
+        
         //ballCenterInitialCoordsX = (Double)enterXCoords.Text;
-        Double.TryParse(enterXCoords.Text, out ballCenterInitialCoordsX);
-        Double.TryParse(enterYCoords.Text, out ballCenterInitialCoordsY);
+        //Double.Parse(enterXCoords.Text, out userBallCoordX);
+        //Double.Parse(enterYCoords.Text, out userBallCoordY);
         ballPanel.Invalidate();
 
         if (bothClocksStopped) {
@@ -312,7 +299,7 @@ public class RicochetBall : Form {
             ballClock.Enabled = false;
             start.Text = "Start";
 
-            // re-enabling these back, maybe disable the start button too?
+            // re-enabling these back
             enterDirection.Enabled = true;
             enterSpeed.Enabled = true;
             enterXCoords.Enabled = true;
@@ -322,13 +309,62 @@ public class RicochetBall : Form {
         bothClocksStopped = !bothClocksStopped;
     }
 
+    private void textFilled(object sender, EventArgs events) {
+        double num = 0.0;
+        string rando = "";
+
+        // Prefilling in the textboxes if empty
+        // this somehow is tied to reset, so if you reset it
+        // speed and direction arent cleared and are set to 100 & 25
+
+        // no i get it, if any function messes with the textbox this whole
+        // algo runs
+        /*if (enterSpeed.Text == "") {
+            enterSpeed.Text = "100";
+        }
+        if (enterDirection.Text == "") {
+            enterDirection.Text = "25";
+        }
+        if (enterXCoords.Text == "") {
+            enterXCoords.Text = ballCenterInitialCoordsX.ToString();
+        }
+        if (enterYCoords.Text == "") {
+            enterYCoords.Text = ballCenterInitialCoordsY.ToString();
+        }*/
+
+        if (Double.TryParse(enterSpeed.Text, out num) == false ||
+            Double.TryParse(enterDirection.Text, out num) == false ||
+            Double.TryParse(enterXCoords.Text, out userBallCoordX) == false ||
+            Double.TryParse(enterYCoords.Text, out userBallCoordY) == false) {
+            // lowkey annoying seeing that text pop up each time i interact w/the textbox
+            // System.Console.WriteLine("Please only put numbers in the textboxes.");
+            start.Enabled = false;
+
+            if (Double.TryParse(enterXCoords.Text, out userBallCoordX) == true &&
+                Double.TryParse(enterYCoords.Text, out userBallCoordY) == true) {
+                showBall = true;
+                ballPanel.displayBall(showBall, rando);
+            } else {
+                showBall = false;
+                ballPanel.displayBall(showBall, rando);
+            }
+
+            return;
+        } else {
+            showBall = true;
+            ballPanel.displayBall(showBall, rando);
+            start.Enabled = true;
+        }
+}
+
     protected void initClick(Object sender, EventArgs events) {
         showBall = true;
+        string cameHere = "r";
         enterSpeed.Text = "";
         enterDirection.Text = "";
         enterXCoords.Text = ballCenterInitialCoordsX.ToString();
         enterYCoords.Text = ballCenterInitialCoordsY.ToString();
-        ballPanel.displayBall(showBall);
+        ballPanel.displayBall(showBall, cameHere);
     }
 
     protected void quitClick(Object sender, EventArgs events) {
@@ -341,9 +377,11 @@ public class RicochetBall : Form {
         // maybe change the color???
         private Color ballColor = ColorTranslator.FromHtml("#DFFF82");
         private bool ballShown = false;
+        private string initPOS = "";
 
-        public void displayBall(bool ans) {
+        public void displayBall(bool ans, string reply) {
             ballShown = ans;
+            initPOS = reply;
             this.Invalidate();
         }
 
@@ -352,8 +390,13 @@ public class RicochetBall : Form {
 
             // Drawing the ball
             if (ballShown == true) {
-                ballUpperLeftCurrCoordsX = ballCenterInitialCoordsX - ballRadius;
-                ballUpperLeftCurrCoordsY = ballCenterInitialCoordsY - ballRadius;
+                if (initPOS == "r") {
+                    ballUpperLeftCurrCoordsX = ballCenterInitialCoordsX - ballRadius;
+                    ballUpperLeftCurrCoordsY = ballCenterInitialCoordsY - ballRadius;
+                } else {
+                    ballUpperLeftCurrCoordsX = userBallCoordX - ballRadius;
+                    ballUpperLeftCurrCoordsY = userBallCoordY - ballRadius;
+                }
                 Brush colorfulBrush = new SolidBrush(ballColor);
                 graph.FillEllipse(colorfulBrush,
                                 (int)ballUpperLeftCurrCoordsX,
