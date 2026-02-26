@@ -95,6 +95,8 @@ public class RicochetBall : Form {
 
     private int objMargin = 40;
     private int tinyMargin = 10;
+    private bool bothClocksStopped = true;
+    private bool showBall = false;
 
     public RicochetBall() {
         // Setting up the UI
@@ -109,7 +111,7 @@ public class RicochetBall : Form {
         // Setting up the buttons
         initial.Size = new Size(200, 45);
         initial.Location = new Point(40, titleHeight + ballHeight + 15);
-        initial.Text = "Initial";
+        initial.Text = "Reset";
         initial.TextAlign = ContentAlignment.MiddleCenter;
         initial.Font = new Font("Georgia", 20, FontStyle.Bold);
         initial.BackColor = ColorTranslator.FromHtml("#CF7669");
@@ -219,7 +221,8 @@ public class RicochetBall : Form {
 
 
         coords.Size = new Size(500, 45);
-        coords.Location = new Point(enterYCoords.Right + (xCoords.Left - enterYCoords.Right - coords.Width) / 2, (quit.Top + initial.Top) / 2);
+        // StartEdge + (EndEdge - StartEdge - ObjectSize) / 2
+        coords.Location = new Point(enterYCoords.Right + (xCoords.Left - enterYCoords.Right - coords.Width) / 2, initial.Bottom + (quit.Top - initial.Bottom - coords.Height) / 2);
         coords.Text = "Coordinates of the center of the ball";
         coords.TextAlign = ContentAlignment.MiddleCenter;
         coords.Font = new Font("Georgia", 20, FontStyle.Bold);
@@ -250,48 +253,82 @@ public class RicochetBall : Form {
         //Prepare the refresh clock.  A button will start this clock ticking.
         uiRefreshClock.Enabled = false;
         uiRefreshClock.Interval = uiRefreshRate;
-        uiRefreshClock.Elapsed += new ElapsedEventHandler(refreshUI);
+        //uiRefreshClock.Elapsed += new ElapsedEventHandler(refreshUI);
 
         //Prepare the ball clock.  A button will start this clock ticking.
         ballClock.Enabled = false;  //Initially this clock is stopped.
-        ballClock.Interval = ballClockInterval;
-        ballClock.Elapsed += new ElapsedEventHandler(updateBallCoords);
+        ballClock.Interval = ballClockRate;
+        //ballClock.Elapsed += new ElapsedEventHandler(updateBallCoords);
     }
 
-    protected void startClick(Object sender, EventArgs events) (
-        //
-    )
-
-    protected void initialClick(Object sender, EventArgs events) {
+    protected void startClick(Object sender, EventArgs events) {
+        // make it so start gets disbled if a textbox was messed with after hitting Initial
+        // rn the function has to check if its valid, which is repeating code
+        // a helper function wouldve been nice
         double num = 0.0;
-        // do i check for 0 or if its an int??
+
+        // Prefilling in the textboxes if empty
+        if (enterSpeed.Text == "") {
+            enterSpeed.Text = "100";
+        }
+        if (enterDirection.Text == "") {
+            enterDirection.Text = "25";
+        }
+        if (enterXCoords.Text == "") {
+            enterXCoords.Text = "100";
+        }
+        if (enterYCoords.Text == "") {
+            enterYCoords.Text = "100";
+        }
 
         if (Double.TryParse(enterSpeed.Text, out num) == false ||
             Double.TryParse(enterDirection.Text, out num) == false ||
             Double.TryParse(enterXCoords.Text, out num) == false ||
             Double.TryParse(enterYCoords.Text, out num) == false) {
             System.Console.WriteLine("Please only put numbers in the textboxes.");
+            start.Enabled = false;
+            //ballPanel.displayBall(showBall);
             return;
-
-        } else {
-            if (enterSpeed.Text == "") {
-                enterSpeed.Text = "100";
-            }
-
-            if (enterDirection.Text == "") {
-                enterDirection.Text = "25";
-            }
-
-            if (enterXCoords.Text == "") {
-                enterXCoords.Text = "100";
-            }
-
-            if (enterYCoords.Text == "") {
-                enterYCoords.Text = "100";
-            }
         }
 
-        //
+        //ballCenterInitialCoordsX = (Double)enterXCoords.Text;
+        Double.TryParse(enterXCoords.Text, out ballCenterInitialCoordsX);
+        Double.TryParse(enterYCoords.Text, out ballCenterInitialCoordsY);
+        ballPanel.Invalidate();
+
+        if (bothClocksStopped) {
+            start.Text = "Pause";
+            uiRefreshClock.Enabled = true;
+            ballClock.Enabled = true;
+
+            // Ensuring that these can't be messed with while the ball is moving
+            enterDirection.Enabled = false;
+            enterSpeed.Enabled = false;
+            enterXCoords.Enabled = false;
+            enterYCoords.Enabled = false;
+            initial.Enabled = false;
+        } else {
+            uiRefreshClock.Enabled = false;
+            ballClock.Enabled = false;
+            start.Text = "Start";
+
+            // re-enabling these back, maybe disable the start button too?
+            enterDirection.Enabled = true;
+            enterSpeed.Enabled = true;
+            enterXCoords.Enabled = true;
+            enterYCoords.Enabled = true;
+            initial.Enabled = true;
+        }
+        bothClocksStopped = !bothClocksStopped;
+    }
+
+    protected void initClick(Object sender, EventArgs events) {
+        showBall = true;
+        enterSpeed.Text = "";
+        enterDirection.Text = "";
+        enterXCoords.Text = ballCenterInitialCoordsX.ToString();
+        enterYCoords.Text = ballCenterInitialCoordsY.ToString();
+        ballPanel.displayBall(showBall);
     }
 
     protected void quitClick(Object sender, EventArgs events) {
@@ -303,19 +340,27 @@ public class RicochetBall : Form {
     public class GraphicPanel : Panel {
         // maybe change the color???
         private Color ballColor = ColorTranslator.FromHtml("#DFFF82");
+        private bool ballShown = false;
+
+        public void displayBall(bool ans) {
+            ballShown = ans;
+            this.Invalidate();
+        }
 
         protected override void OnPaint(PaintEventArgs artsy) {
             Graphics graph = artsy.Graphics;
 
             // Drawing the ball
-            ballUpperLeftCurrCoordsX = ballCenterInitialCoordsX - ballRadius;
-            ballUpperLeftCurrCoordsY = ballCenterInitialCoordsY - ballRadius;
-            Brush colorfulBrush = new SolidBrush(ballColor);
-            graph.FillEllipse(colorfulBrush,
-                              (int)ballUpperLeftCurrCoordsX,
-                              (int)ballUpperLeftCurrCoordsY,
-                              (float)(2.0 * ballRadius),
-                              (float)(2.0 * ballRadius));
+            if (ballShown == true) {
+                ballUpperLeftCurrCoordsX = ballCenterInitialCoordsX - ballRadius;
+                ballUpperLeftCurrCoordsY = ballCenterInitialCoordsY - ballRadius;
+                Brush colorfulBrush = new SolidBrush(ballColor);
+                graph.FillEllipse(colorfulBrush,
+                                (int)ballUpperLeftCurrCoordsX,
+                                (int)ballUpperLeftCurrCoordsY,
+                                (float)(2.0 * ballRadius),
+                                (float)(2.0 * ballRadius));
+            }
             base.OnPaint(artsy);
         }
     }
