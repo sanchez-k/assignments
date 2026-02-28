@@ -102,6 +102,13 @@ public class RicochetBall : Form {
     private static double userBallCoordX = 0.0;
     private static double userBallCoordY = 0.0;
 
+    // used to check if the user changed any text
+    private static double speed1 = 0.0;
+    private static double dir1 = 0.0;
+    private static double x1 = 0.0;
+    private static double y1 = 0.0;
+    private static int check = 0;
+
     public RicochetBall() {
         // Setting up the UI
         Text = "Ricochet Ball";
@@ -301,33 +308,10 @@ public class RicochetBall : Form {
     }
 
     private void textFilled(object sender, EventArgs events) {
-
-        // Prefilling in the textboxes if empty
-        // this somehow is tied to reset, so if you reset it
-        // speed and direction arent cleared and are set to 100 & 25
-
-        // no i get it, if any function messes with the textbox this whole
-        // algo runs
-        /*if (enterSpeed.Text == "") {
-            enterSpeed.Text = "100";
-        }
-        if (enterDirection.Text == "") {
-            enterDirection.Text = "25";
-        }
-        if (enterXCoords.Text == "") {
-            enterXCoords.Text = ballCenterInitialCoordsX.ToString();
-        }
-        if (enterYCoords.Text == "") {
-            enterYCoords.Text = ballCenterInitialCoordsY.ToString();
-        }*/
-
-        if (Double.TryParse(enterSpeed.Text, out userBallSpeed) == false ||
-            Double.TryParse(enterDirection.Text, out userBallDirection) == false ||
-            Double.TryParse(enterXCoords.Text, out userBallCoordX) == false ||
-            Double.TryParse(enterYCoords.Text, out userBallCoordY) == false) {
-            // lowkey annoying seeing that text pop up each time i interact w/the textbox
-            // System.Console.WriteLine("Please only put numbers in the textboxes.");
-            start.Enabled = false;
+        if (Double.TryParse(enterSpeed.Text, out speed1) == false ||
+            Double.TryParse(enterDirection.Text, out dir1) == false ||
+            Double.TryParse(enterXCoords.Text, out x1) == false ||
+            Double.TryParse(enterYCoords.Text, out y1) == false) {
 
             if (Double.TryParse(enterXCoords.Text, out userBallCoordX) == true &&
                 Double.TryParse(enterYCoords.Text, out userBallCoordY) == true) {
@@ -337,9 +321,18 @@ public class RicochetBall : Form {
                 showBall = false;
                 ballPanel.displayBall(showBall);
             }
-
+            initial.Enabled = false;
             return;
         } else {
+            if (check >= 1) {
+                start.Enabled = false;
+            }
+            // this updates any new changes into the variables
+            userBallSpeed = speed1;
+            userBallDirection = dir1;
+            userBallCoordX = x1;
+            userBallCoordY = y1;
+
             showBall = true;
             ballPanel.displayBall(showBall);
 
@@ -360,19 +353,19 @@ public class RicochetBall : Form {
             ballDeltaY = pixelPerTic * ballDirectionY / hypotenuse;
 
             //ballDeltaX = - pixelPerTic;
+
+
             initial.Enabled = true;
+            // always increases so the user needs to click initialize every time before clicking start
+            // i miss it as a reset button (◞‸◟,) 
+            check++;
         }
     }
 
     protected void initClick(Object sender, EventArgs events) {
         showBall = true;
-        enterSpeed.Text = "";
-        enterDirection.Text = "";
-        enterXCoords.Text = ballCenterInitialCoordsX.ToString();
-        ballCenterCurrCoordsX = Double.Parse(enterXCoords.Text);
-        enterYCoords.Text = ballCenterInitialCoordsY.ToString();
-        ballCenterCurrCoordsY = Double.Parse(enterYCoords.Text);
         ballPanel.displayBall(showBall);
+        start.Enabled = true;
     }
 
     protected void quitClick(Object sender, EventArgs events) {
