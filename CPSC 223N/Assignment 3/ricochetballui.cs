@@ -58,9 +58,9 @@ public class RicochetBall : Form {
 
     // Speed variables
     // The speed the user gives (pixels per second)
-    private double speedPerSec;
+    private double pixelPerSec;
     // How far should the ball move each time the timer tics
-    private double speedPerTic;
+    private double pixelPerTic;
 
     // Direction variables, so how many pixels it should move to the right/left & up/down
     private double ballDirectionX;
@@ -85,7 +85,7 @@ public class RicochetBall : Form {
     private static System.Timers.Timer ballClock = new System.Timers.Timer();
     // How often the ball's coords gets updated
     // So it updates 60.5 times per second which is around 0.0165 seconds, itll add the deltas
-    private const double ballClockRate = 60.5;  //Units are Hz
+    private const double ballClockRate = 58.5;  //Units are Hz
 
     // Another timer object
     private static System.Timers.Timer uiRefreshClock = new System.Timers.Timer();
@@ -225,6 +225,7 @@ public class RicochetBall : Form {
 
 
         coords.Size = new Size(500, 45);
+        // to center it
         // StartEdge + (EndEdge - StartEdge - ObjectSize) / 2
         coords.Location = new Point(enterYCoords.Right + (xCoords.Left - enterYCoords.Right - coords.Width) / 2, initial.Bottom + (quit.Top - initial.Bottom - coords.Height) / 2);
         coords.Text = "Coordinates of the center of the ball";
@@ -257,12 +258,12 @@ public class RicochetBall : Form {
         //Prepare the refresh clock.  A button will start this clock ticking.
         uiRefreshClock.Enabled = false;
         uiRefreshClock.Interval = uiRefreshRate;
-        //uiRefreshClock.Elapsed += new ElapsedEventHandler(refreshUI);
+        uiRefreshClock.Elapsed += new ElapsedEventHandler(refreshUI);
 
         //Prepare the ball clock.  A button will start this clock ticking.
         ballClock.Enabled = false;  //Initially this clock is stopped.
         ballClock.Interval = ballClockRate;
-        //ballClock.Elapsed += new ElapsedEventHandler(updateBallCoords);
+        ballClock.Elapsed += new ElapsedEventHandler(updateBallCoords);
 
         // this hooks up any text changes to the function textFilled, kinda like a button
         // but you write stuff in it instead
@@ -273,16 +274,6 @@ public class RicochetBall : Form {
     }
 
     protected void startClick(Object sender, EventArgs events) {
-        // make it so start gets disbled if a textbox was messed with after hitting Initial
-        // rn the function has to check if its valid, which is repeating code
-        // a helper function wouldve been nice
-        double num = 0.0;
-        
-        //ballCenterInitialCoordsX = (Double)enterXCoords.Text;
-        //Double.Parse(enterXCoords.Text, out userBallCoordX);
-        //Double.Parse(enterYCoords.Text, out userBallCoordY);
-        ballPanel.Invalidate();
-
         if (bothClocksStopped) {
             start.Text = "Pause";
             uiRefreshClock.Enabled = true;
@@ -310,7 +301,6 @@ public class RicochetBall : Form {
     }
 
     private void textFilled(object sender, EventArgs events) {
-        double num = 0.0;
         string rando = "";
 
         // Prefilling in the textboxes if empty
@@ -332,8 +322,8 @@ public class RicochetBall : Form {
             enterYCoords.Text = ballCenterInitialCoordsY.ToString();
         }*/
 
-        if (Double.TryParse(enterSpeed.Text, out num) == false ||
-            Double.TryParse(enterDirection.Text, out num) == false ||
+        if (Double.TryParse(enterSpeed.Text, out userBallSpeed) == false ||
+            Double.TryParse(enterDirection.Text, out userBallDirection) == false ||
             Double.TryParse(enterXCoords.Text, out userBallCoordX) == false ||
             Double.TryParse(enterYCoords.Text, out userBallCoordY) == false) {
             // lowkey annoying seeing that text pop up each time i interact w/the textbox
@@ -353,9 +343,25 @@ public class RicochetBall : Form {
         } else {
             showBall = true;
             ballPanel.displayBall(showBall, rando);
+
+            ballCenterCurrCoordsX = userBallCoordX;
+            ballCenterCurrCoordsY = userBallCoordY;
+            pixelPerTic = userBallSpeed/ballClockRate;
+
+            double radians = userBallDirection * Math.PI / 180.0;
+            ballDirectionX = userBallSpeed * Math.Cos(radians);
+            ballDirectionY = userBallSpeed * Math.Sin(radians);
+
+            // idk about this math
+            double hypotenuse_squared = ballDirectionX*ballDirectionX + ballDirectionY*ballDirectionY;
+            double hypotenuse = System.Math.Sqrt(hypotenuse_squared);
+            ballDeltaX = pixelPerTic * ballDirectionX / hypotenuse;
+            ballDeltaY = pixelPerTic * ballDirectionY / hypotenuse;
+
+            //ballDeltaX = - pixelPerTic;
             start.Enabled = true;
         }
-}
+    }
 
     protected void initClick(Object sender, EventArgs events) {
         showBall = true;
@@ -363,12 +369,43 @@ public class RicochetBall : Form {
         enterSpeed.Text = "";
         enterDirection.Text = "";
         enterXCoords.Text = ballCenterInitialCoordsX.ToString();
+        ballCenterCurrCoordsX = Double.Parse(enterXCoords.Text);
         enterYCoords.Text = ballCenterInitialCoordsY.ToString();
+        ballCenterCurrCoordsY = Double.Parse(enterYCoords.Text);
         ballPanel.displayBall(showBall, cameHere);
     }
 
     protected void quitClick(Object sender, EventArgs events) {
         Close();
+    }
+
+    protected void updateBallCoords(System.Object sender, ElapsedEventArgs events) {
+
+        ballCenterCurrCoordsX += ballDeltaX;
+      ballCenterCurrCoordsY -= ballDeltaY;  //The minus sign is due to the upside down nature of the C# system.
+      //System.Console.WriteLine("The motion clock ticked and the time is {0}", evt.SignalTime);//Debug statement; remove later.
+      //Determine if the ball has made a collision with the right wall.
+      if((int)System.Math.Round(ballCenterCurrCoordsX + ballRadius) >= formWidth)
+             ballDeltaX = -ballDeltaX;
+      //Determine if the ball has made a collision with the lower wall
+      //if(ball_center_current_coord_y .....)  //To be completed by students in 223N
+      //Determine if the ball has made a collision with the left wall
+      //if(ball_center_current_coord_y .....)  //To be completed by students in 223N
+      //Determine if the ball has made a collision with the upper wall
+      //if(ball_center_current_coord_x .....)  //To be completed by students in 223N
+
+      //The next statement checks to determine if the ball has traveled beyond the four boundaries.  The statement may be
+      //removed after the ricochet feature has been implemented by a 223N student.
+      if((int)System.Math.Round(ballCenterCurrCoordsY - ballRadius) >= titleHeight + ballHeight)
+          {ballClock.Enabled = false;
+           uiRefreshClock.Enabled = false;
+           System.Console.WriteLine("The clock controlling the ball has stopped.");
+        return;
+    }
+    }
+
+    protected void refreshUI(System.Object sender, ElapsedEventArgs even) {
+        ballPanel.Invalidate();
     }
 
     // prof didnt need a graphic panel since the whole UI, in ricochet ball, was drawn
