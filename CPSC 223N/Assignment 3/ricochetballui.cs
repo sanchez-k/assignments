@@ -115,11 +115,11 @@ public class RicochetBall : Form {
         // Setting up the buttons
         initial.Size = new Size(200, 45);
         initial.Location = new Point(40, titleHeight + ballHeight + 15);
-        initial.Text = "Reset";
+        initial.Text = "Initialize";
         initial.TextAlign = ContentAlignment.MiddleCenter;
         initial.Font = new Font("Georgia", 20, FontStyle.Bold);
         initial.BackColor = ColorTranslator.FromHtml("#CF7669");
-        initial.Enabled = true;
+        initial.Enabled = false;
         initial.Click += new EventHandler(initClick);
         Controls.Add(initial);
         
@@ -301,7 +301,6 @@ public class RicochetBall : Form {
     }
 
     private void textFilled(object sender, EventArgs events) {
-        string rando = "";
 
         // Prefilling in the textboxes if empty
         // this somehow is tied to reset, so if you reset it
@@ -333,17 +332,19 @@ public class RicochetBall : Form {
             if (Double.TryParse(enterXCoords.Text, out userBallCoordX) == true &&
                 Double.TryParse(enterYCoords.Text, out userBallCoordY) == true) {
                 showBall = true;
-                ballPanel.displayBall(showBall, rando);
+                ballPanel.displayBall(showBall);
             } else {
                 showBall = false;
-                ballPanel.displayBall(showBall, rando);
+                ballPanel.displayBall(showBall);
             }
 
             return;
         } else {
             showBall = true;
-            ballPanel.displayBall(showBall, rando);
+            ballPanel.displayBall(showBall);
 
+
+            // mathhhhh
             ballCenterCurrCoordsX = userBallCoordX;
             ballCenterCurrCoordsY = userBallCoordY;
             pixelPerTic = userBallSpeed/ballClockRate;
@@ -359,20 +360,19 @@ public class RicochetBall : Form {
             ballDeltaY = pixelPerTic * ballDirectionY / hypotenuse;
 
             //ballDeltaX = - pixelPerTic;
-            start.Enabled = true;
+            initial.Enabled = true;
         }
     }
 
     protected void initClick(Object sender, EventArgs events) {
         showBall = true;
-        string cameHere = "r";
         enterSpeed.Text = "";
         enterDirection.Text = "";
         enterXCoords.Text = ballCenterInitialCoordsX.ToString();
         ballCenterCurrCoordsX = Double.Parse(enterXCoords.Text);
         enterYCoords.Text = ballCenterInitialCoordsY.ToString();
         ballCenterCurrCoordsY = Double.Parse(enterYCoords.Text);
-        ballPanel.displayBall(showBall, cameHere);
+        ballPanel.displayBall(showBall);
     }
 
     protected void quitClick(Object sender, EventArgs events) {
@@ -414,11 +414,9 @@ public class RicochetBall : Form {
         // maybe change the color???
         private Color ballColor = ColorTranslator.FromHtml("#DFFF82");
         private bool ballShown = false;
-        private string initPOS = "";
 
-        public void displayBall(bool ans, string reply) {
+        public void displayBall(bool ans) {
             ballShown = ans;
-            initPOS = reply;
             this.Invalidate();
         }
 
@@ -426,14 +424,9 @@ public class RicochetBall : Form {
             Graphics graph = artsy.Graphics;
 
             // Drawing the ball
-            if (ballShown == true) {
-                if (initPOS == "r") {
-                    ballUpperLeftCurrCoordsX = ballCenterInitialCoordsX - ballRadius;
-                    ballUpperLeftCurrCoordsY = ballCenterInitialCoordsY - ballRadius;
-                } else {
-                    ballUpperLeftCurrCoordsX = userBallCoordX - ballRadius;
-                    ballUpperLeftCurrCoordsY = userBallCoordY - ballRadius;
-                }
+            if (ballShown == true) {    
+                ballUpperLeftCurrCoordsX = userBallCoordX - ballRadius;
+                ballUpperLeftCurrCoordsY = userBallCoordY - ballRadius;
                 Brush colorfulBrush = new SolidBrush(ballColor);
                 graph.FillEllipse(colorfulBrush,
                                 (int)ballUpperLeftCurrCoordsX,
