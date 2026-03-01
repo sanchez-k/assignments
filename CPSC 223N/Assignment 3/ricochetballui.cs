@@ -57,22 +57,12 @@ public class RicochetBall : Form {
     private const double ballRadius = 12.65;
 
     // Speed variables
-    // The speed the user gives (pixels per second)
-    private double pixelPerSec;
     // How far should the ball move each time the timer tics
     private double pixelPerTic;
-
-    // Direction variables, so how many pixels it should move to the right/left & up/down
-    private double ballDirectionX;
-    private double ballDirectionY;
 
     // How much pixels the ball should move per frame
     private double ballDeltaX;
     private double ballDeltaY;
-
-    // Where the ball is initially drawn, it's going to be in the center
-    private static double ballCenterInitialCoordsX = formWidth / 2;
-    private static double ballCenterInitialCoordsY = ballHeight / 2;
 
     // This helps to perfectly draw a circle
     private static double ballCenterCurrCoordsX;
