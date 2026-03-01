@@ -439,3 +439,16 @@ public class RicochetBall : Form {
 
 // #CF69B8
 // 69CFA1
+
+// hypotenuse = speed (14)
+// theta = direction (29)
+// sin = opp (which is y)/hyp
+    // sin 29 degree = opp/14
+    // cancel out 14
+    // opp = 14 (sin 29)
+    // y = 6.79 pixel/sec
+
+// cah = adj (which is x) / hyp
+    // cos 29 = adj/14
+    // adj 14 (cos 29)
+    // x = 12.24 pixel/sec
