@@ -85,13 +85,13 @@ public class RicochetBall : Form {
     private static System.Timers.Timer ballClock = new System.Timers.Timer();
     // How often the ball's coords gets updated
     // So it updates 60.5 times per second which is around 0.0165 seconds, itll add the deltas
-    private const double ballClockRate = 58.5;  //Units are Hz
+    private const double ballClockRate = 57.3;  //Units are Hz
 
     // Another timer object
     private static System.Timers.Timer uiRefreshClock = new System.Timers.Timer();
     // This updates how often the ball gets redrawn
     // Nums for both clocks should be diff because it can create a timing artifact
-    private const double uiRefreshRate = 60.3;  //Units are Hz = #refreshes per second
+    private const double uiRefreshRate = 60.8;  //Units are Hz = #refreshes per second
 
     private int objMargin = 40;
     private int tinyMargin = 10;
@@ -262,13 +262,13 @@ public class RicochetBall : Form {
 
         //Prepare the refresh clock.  A button will start this clock ticking.
         uiRefreshClock.Enabled = false;
-        uiRefreshClock.Interval = uiRefreshRate;
+        uiRefreshClock.Interval = (int)System.Math.Round(1000.0 / uiRefreshRate);;
         uiRefreshClock.Elapsed += new ElapsedEventHandler(refreshUI);
 
         //Prepare the ball clock.  A button will start this clock ticking.
         ballClock.Enabled = false;
         // you need the 1000 to make it around 17.09 ms which is almost 60 fps
-        ballClock.Interval = 1000.0 / ballClockRate;
+        ballClock.Interval = (int)System.Math.Round(1000.0 / ballClockRate);
         ballClock.Elapsed += new ElapsedEventHandler(updateBallCoords);
 
         // this hooks up any text changes to the function textFilled, kinda like a button
@@ -310,19 +310,22 @@ public class RicochetBall : Form {
         if (Double.TryParse(enterSpeed.Text, out speed1) == false ||
             Double.TryParse(enterDirection.Text, out dir1) == false ||
             Double.TryParse(enterXCoords.Text, out x1) == false ||
-            Double.TryParse(enterYCoords.Text, out y1) == false) {
+            Double.TryParse(enterYCoords.Text, out y1) == false ||
+            speed1 < 0 || x1 < 0 || y1 < 0) {
 
             if (Double.TryParse(enterXCoords.Text, out ballCenterCurrCoordsX) == true &&
-                Double.TryParse(enterYCoords.Text, out ballCenterCurrCoordsY) == true) {
+                Double.TryParse(enterYCoords.Text, out ballCenterCurrCoordsY) == true &&
+                ballCenterCurrCoordsX >= 0 && ballCenterCurrCoordsY >= 0) {
                 showBall = true;
                 ballPanel.displayBall(showBall);
+
             } else {
                 showBall = false;
                 ballPanel.displayBall(showBall);
             }
+
             initial.Enabled = false;
             return;
-
         } else {
             if (check >= 1) {
                 start.Enabled = false;
@@ -335,7 +338,7 @@ public class RicochetBall : Form {
 
             showBall = true;
             ballPanel.displayBall(showBall);
-            
+
             pixelPerTic = userBallSpeed/ballClockRate;
 
             // this calculates the movement of x and y
@@ -361,30 +364,34 @@ public class RicochetBall : Form {
     }
 
     protected void updateBallCoords(System.Object sender, ElapsedEventArgs events) {
-
-
         ballCenterCurrCoordsX += ballDeltaX;
-        ballCenterCurrCoordsY -= ballDeltaY;  //The minus sign is due to the upside down nature of the C# system.
-      //System.Console.WriteLine("The motion clock ticked and the time is {0}", evt.SignalTime);//Debug statement; remove later.
-      //Determine if the ball has made a collision with the right wall.
-      //if((int)System.Math.Round(ballCenterCurrCoordsX + ballRadius) >= formWidth)
-             //ballDeltaX = -ballDeltaX;
-      //Determine if the ball has made a collision with the lower wall
-      //if(ball_center_current_coord_y .....)  //To be completed by students in 223N
-      //Determine if the ball has made a collision with the left wall
-      //if(ball_center_current_coord_y .....)  //To be completed by students in 223N
-      //Determine if the ball has made a collision with the upper wall
-      //if(ball_center_current_coord_x .....)  //To be completed by students in 223N
+        ballCenterCurrCoordsY -= ballDeltaY;  
 
-      //The next statement checks to determine if the ball has traveled beyond the four boundaries.  The statement may be
-      //removed after the ricochet feature has been implemented by a 223N student.
-      /*if((int)System.Math.Round(ballCenterCurrCoordsY - ballRadius) >= titleHeight + ballHeight)
-          {
-            ballClock.Enabled = false;
-           uiRefreshClock.Enabled = false;
-           System.Console.WriteLine("The clock controlling the ball has stopped.");
-        return;
-        }*/
+        // ricochet if it hits the right wall
+        // center + radius checks the right edge of the ball
+        if ((int)System.Math.Round(ballCenterCurrCoordsX + ballRadius) >= formWidth) {
+            // this makes deltaX a negative
+            ballDeltaX = -ballDeltaX;
+        }
+
+        // ricochet if it hits the right wall
+        // this checks the left edge of the ball
+        if ((int)System.Math.Round(ballCenterCurrCoordsX - ballRadius) <= 0) {
+            // this flips the sign, so it turns it into a positive
+            ballDeltaX = -ballDeltaX;
+        }
+        
+        // this checks the top edge of the ball
+        if ((int)System.Math.Round(ballCenterCurrCoordsY - ballRadius) <= 0) {
+            // this flips the sign, so it turns it into a negative
+            ballDeltaY = -ballDeltaY;
+        }
+
+        // this check the bottom edge of the ball
+        if ((int)System.Math.Round(ballCenterCurrCoordsY + ballRadius) >= ballHeight) {
+            // this flips the sign, so it turns it into a positive
+            ballDeltaY = -ballDeltaY;
+        }
     }
 
     protected void refreshUI(System.Object sender, ElapsedEventArgs even) {
@@ -424,23 +431,5 @@ public class RicochetBall : Form {
 
 // backcolor
 
-// fix location of coords
-
-
 // #CF69B8
 // 69CFA1
-
-// hypotenuse = speed (14)
-// theta = direction (29)
-// sin = opp (which is y)/hyp
-    // sin 29 degree = opp/14
-    // cancel out 14
-    // opp = 14 (sin 29)
-    // y = 6.79 pixel/sec
-
-// cah = adj (which is x) / hyp
-    // cos 29 = adj/14
-    // adj 14 (cos 29)
-    // x = 12.24 pixel/sec
-
-    // prob dont need userBallCoord
