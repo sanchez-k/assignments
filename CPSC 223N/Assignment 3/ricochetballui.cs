@@ -75,8 +75,8 @@ public class RicochetBall : Form {
     private static double ballCenterInitialCoordsY = ballHeight / 2;
 
     // This helps to perfectly draw a circle
-    private double ballCenterCurrCoordsX;
-    private double ballCenterCurrCoordsY;
+    private static double ballCenterCurrCoordsX;
+    private static double ballCenterCurrCoordsY;
     private static double ballUpperLeftCurrCoordsX;
     private static double ballUpperLeftCurrCoordsY;
 
@@ -99,8 +99,6 @@ public class RicochetBall : Form {
     private bool showBall = false;
     private static double userBallSpeed = 0.0;
     private static double userBallDirection = 0.0;
-    private static double userBallCoordX = 0.0;
-    private static double userBallCoordY = 0.0;
 
     // used to check if the user changed any text
     private static double speed1 = 0.0;
@@ -268,8 +266,9 @@ public class RicochetBall : Form {
         uiRefreshClock.Elapsed += new ElapsedEventHandler(refreshUI);
 
         //Prepare the ball clock.  A button will start this clock ticking.
-        ballClock.Enabled = false;  //Initially this clock is stopped.
-        ballClock.Interval = ballClockRate;
+        ballClock.Enabled = false;
+        // you need the 1000 to make it around 17.09 ms which is almost 60 fps
+        ballClock.Interval = 1000.0 / ballClockRate;
         ballClock.Elapsed += new ElapsedEventHandler(updateBallCoords);
 
         // this hooks up any text changes to the function textFilled, kinda like a button
@@ -313,8 +312,8 @@ public class RicochetBall : Form {
             Double.TryParse(enterXCoords.Text, out x1) == false ||
             Double.TryParse(enterYCoords.Text, out y1) == false) {
 
-            if (Double.TryParse(enterXCoords.Text, out userBallCoordX) == true &&
-                Double.TryParse(enterYCoords.Text, out userBallCoordY) == true) {
+            if (Double.TryParse(enterXCoords.Text, out ballCenterCurrCoordsX) == true &&
+                Double.TryParse(enterYCoords.Text, out ballCenterCurrCoordsY) == true) {
                 showBall = true;
                 ballPanel.displayBall(showBall);
             } else {
@@ -323,6 +322,7 @@ public class RicochetBall : Form {
             }
             initial.Enabled = false;
             return;
+
         } else {
             if (check >= 1) {
                 start.Enabled = false;
@@ -330,29 +330,17 @@ public class RicochetBall : Form {
             // this updates any new changes into the variables
             userBallSpeed = speed1;
             userBallDirection = dir1;
-            userBallCoordX = x1;
-            userBallCoordY = y1;
+            ballCenterCurrCoordsX = x1;
+            ballCenterCurrCoordsY = y1;
 
             showBall = true;
             ballPanel.displayBall(showBall);
-
-
-            // mathhhhh
-            ballCenterCurrCoordsX = userBallCoordX;
-            ballCenterCurrCoordsY = userBallCoordY;
+            
             pixelPerTic = userBallSpeed/ballClockRate;
 
-            double radians = userBallDirection * Math.PI / 180.0;
-            ballDirectionX = userBallSpeed * Math.Cos(radians);
-            ballDirectionY = userBallSpeed * Math.Sin(radians);
-
-            // idk about this math
-            double hypotenuse_squared = ballDirectionX*ballDirectionX + ballDirectionY*ballDirectionY;
-            double hypotenuse = System.Math.Sqrt(hypotenuse_squared);
-            ballDeltaX = pixelPerTic * ballDirectionX / hypotenuse;
-            ballDeltaY = pixelPerTic * ballDirectionY / hypotenuse;
-
-            //ballDeltaX = - pixelPerTic;
+            // this calculates the movement of x and y
+            ballDeltaX = pixelPerTic * Math.Cos(userBallDirection * Math.PI/180.0);
+            ballDeltaY = pixelPerTic * Math.Sin(userBallDirection * Math.PI/180.0);
 
 
             initial.Enabled = true;
@@ -374,12 +362,13 @@ public class RicochetBall : Form {
 
     protected void updateBallCoords(System.Object sender, ElapsedEventArgs events) {
 
+
         ballCenterCurrCoordsX += ballDeltaX;
-      ballCenterCurrCoordsY -= ballDeltaY;  //The minus sign is due to the upside down nature of the C# system.
+        ballCenterCurrCoordsY -= ballDeltaY;  //The minus sign is due to the upside down nature of the C# system.
       //System.Console.WriteLine("The motion clock ticked and the time is {0}", evt.SignalTime);//Debug statement; remove later.
       //Determine if the ball has made a collision with the right wall.
-      if((int)System.Math.Round(ballCenterCurrCoordsX + ballRadius) >= formWidth)
-             ballDeltaX = -ballDeltaX;
+      //if((int)System.Math.Round(ballCenterCurrCoordsX + ballRadius) >= formWidth)
+             //ballDeltaX = -ballDeltaX;
       //Determine if the ball has made a collision with the lower wall
       //if(ball_center_current_coord_y .....)  //To be completed by students in 223N
       //Determine if the ball has made a collision with the left wall
@@ -389,12 +378,13 @@ public class RicochetBall : Form {
 
       //The next statement checks to determine if the ball has traveled beyond the four boundaries.  The statement may be
       //removed after the ricochet feature has been implemented by a 223N student.
-      if((int)System.Math.Round(ballCenterCurrCoordsY - ballRadius) >= titleHeight + ballHeight)
-          {ballClock.Enabled = false;
+      /*if((int)System.Math.Round(ballCenterCurrCoordsY - ballRadius) >= titleHeight + ballHeight)
+          {
+            ballClock.Enabled = false;
            uiRefreshClock.Enabled = false;
            System.Console.WriteLine("The clock controlling the ball has stopped.");
         return;
-    }
+        }*/
     }
 
     protected void refreshUI(System.Object sender, ElapsedEventArgs even) {
@@ -418,8 +408,8 @@ public class RicochetBall : Form {
 
             // Drawing the ball
             if (ballShown == true) {    
-                ballUpperLeftCurrCoordsX = userBallCoordX - ballRadius;
-                ballUpperLeftCurrCoordsY = userBallCoordY - ballRadius;
+                ballUpperLeftCurrCoordsX = ballCenterCurrCoordsX - ballRadius;
+                ballUpperLeftCurrCoordsY = ballCenterCurrCoordsY - ballRadius;
                 Brush colorfulBrush = new SolidBrush(ballColor);
                 graph.FillEllipse(colorfulBrush,
                                 (int)ballUpperLeftCurrCoordsX,
@@ -452,3 +442,5 @@ public class RicochetBall : Form {
     // cos 29 = adj/14
     // adj 14 (cos 29)
     // x = 12.24 pixel/sec
+
+    // prob dont need userBallCoord
