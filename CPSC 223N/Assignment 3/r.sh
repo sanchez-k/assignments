@@ -3,7 +3,7 @@
 # Cwid:  884962788
 # Assignment:  3
 # Program:  Ricochet Ball
-# Due:  March 6, 2026 @ 11:59pm
+# Due:  March 8, 2026 @ 11:59pm
 # Course:  CPSC223N
 # Languages: C# & Bash
 # Purpose: To animate a ball that ricochets off of a wall. It's speed and
@@ -27,7 +27,7 @@ mcs -r:System -r:System.Windows.Forms -r:ricochetballui.dll -out:ricochetball.ex
 echo View the list of files in the current folder
 ls -l
 
-echo Run the Assignment 2 program.
+echo Run the Assignment 3 program.
 ./ricochetball.exe
 
 echo The script has terminated.
