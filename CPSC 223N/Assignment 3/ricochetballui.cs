@@ -40,6 +40,8 @@ public class RicochetBall : Form {
     private TextBox enterDirection = new TextBox();
     private TextBox enterXCoords = new TextBox();
     private TextBox enterYCoords = new TextBox();
+    private TextBox updatezX = new TextBox();
+    private TextBox updatezY = new TextBox();
 
     private Button initial = new Button();
     private Button start = new Button();
@@ -194,6 +196,13 @@ public class RicochetBall : Form {
         enterYCoords.Text = "";
         enterYCoords.Font = new Font("Georgia", 20, FontStyle.Regular);
         Controls.Add(enterYCoords);
+        //
+        updatezY.Size = new Size(200, 45);
+        updatezY.Location = new Point(quit.Left - updatezY.Width - objMargin, quit.Top);
+        updatezY.Text = "";
+        updatezY.Font = new Font("Georgia", 20, FontStyle.Regular);
+        updatezY.Enabled = false;
+        Controls.Add(updatezY);
 
         yCoords.Size = new Size(50, 45);
         yCoords.Location = new Point(enterYCoords.Left - yCoords.Width - tinyMargin, quit.Top);
@@ -209,6 +218,13 @@ public class RicochetBall : Form {
         enterXCoords.Text = "";
         enterXCoords.Font = new Font("Georgia", 20, FontStyle.Regular);
         Controls.Add(enterXCoords);
+        //
+        updatezX.Size = new Size(200, 45);
+        updatezX.Location = new Point(yCoords.Left - updatezX.Width - objMargin, quit.Top);
+        updatezX.Text = "";
+        updatezX.Font = new Font("Georgia", 20, FontStyle.Regular);
+        updatezX.Enabled = false;
+        Controls.Add(updatezX);
 
         xCoords.Size = new Size(50, 45);
         xCoords.Location = new Point(enterXCoords.Left - xCoords.Width - tinyMargin, quit.Top);
@@ -274,6 +290,11 @@ public class RicochetBall : Form {
             start.Text = "Pause";
             uiRefreshClock.Enabled = true;
             ballClock.Enabled = true;
+            //
+            updatezX.Visible = true;
+            updatezY.Visible = true;
+            enterXCoords.Visible = false;
+            enterYCoords.Visible = false;
 
             // Ensuring that these can't be messed with while the ball is moving
             enterDirection.Enabled = false;
@@ -285,6 +306,14 @@ public class RicochetBall : Form {
             uiRefreshClock.Enabled = false;
             ballClock.Enabled = false;
             start.Text = "Start";
+            //
+            updatezX.Visible = false;
+            updatezY.Visible = false;
+            enterXCoords.Visible = true;
+            enterYCoords.Visible = true;
+            enterXCoords.Text = ballCenterCurrCoordsX.ToString();
+            //enterYCoords.Text = ballCenterCurrCoordsY.ToString();
+            start.Enabled = true;
 
             // re-enabling these back
             enterDirection.Enabled = true;
@@ -344,8 +373,6 @@ public class RicochetBall : Form {
     }
 
     protected void initClick(Object sender, EventArgs events) {
-        showBall = true;
-        ballPanel.displayBall(showBall);
         start.Enabled = true;
     }
 
@@ -355,7 +382,13 @@ public class RicochetBall : Form {
 
     protected void updateBallCoords(System.Object sender, ElapsedEventArgs events) {
         ballCenterCurrCoordsX += ballDeltaX;
-        ballCenterCurrCoordsY -= ballDeltaY;  
+        ballCenterCurrCoordsY -= ballDeltaY;
+        //
+        updatezX.Text = ballCenterCurrCoordsX.ToString("F2");
+        updatezY.Text = ballCenterCurrCoordsY.ToString("F2");
+        // update the coords pos as it moves?? maybe?
+        //enterXCoords.Text = ballCenterCurrCoordsX.ToString();
+        //enterYCoords.Text = ballCenterCurrCoordsY.ToString();
 
         // ricochet if it hits the right wall
         // center + radius checks the right edge of the ball
