@@ -99,10 +99,6 @@ public class RicochetBall : Form {
     private static double dir1 = 0.0;
     private static int check = 0;
 
-    // used to update the coords
-    private static double x1 = 0.0;
-    private static double y1 = 0.0;
-
     public RicochetBall() {
         // Setting up the UI
         Text = "Ricochet Ball";
