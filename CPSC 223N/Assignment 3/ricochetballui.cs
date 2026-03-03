@@ -360,7 +360,7 @@ public class RicochetBall : Form {
 
         // ricochet if it hits the right wall
         // center + radius checks the right edge of the ball
-        if ((int)System.Math.Round(ballCenterCurrCoordsX + ballRadius) >= formWidth) {
+        if ((int)System.Math.Round(ballCenterCurrCoordsX + ballRadius) >= this.ClientSize.Width) {
             // this makes deltaX a negative
             ballDeltaX = -ballDeltaX;
         }
