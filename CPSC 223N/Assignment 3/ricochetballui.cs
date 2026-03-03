@@ -126,7 +126,7 @@ public class RicochetBall : Form {
         
         start.Size = new Size(200, 45);
         // ClientSize is the actual size of the UI, it doesnt include the title bar & borders
-        // button.Height gives me the y coord, which is 40
+        // button.Height gives me the y coord, which is 45
         start.Location = new Point(40, this.ClientSize.Height - start.Height - 15);
         start.Text = "Start";
         start.TextAlign = ContentAlignment.MiddleCenter;
@@ -308,7 +308,7 @@ public class RicochetBall : Form {
     private void textFilled(object sender, EventArgs events) {
         if (Double.TryParse(enterSpeed.Text, out speed1) == false ||
             Double.TryParse(enterDirection.Text, out dir1) == false ||
-            speed1 < 0 || x1 < 0 || y1 < 0) {
+            speed1 < 0) {
             showBall = false;
             ballPanel.displayBall(showBall);
             enterXCoords.Text = "";
@@ -365,19 +365,21 @@ public class RicochetBall : Form {
             ballDeltaX = -ballDeltaX;
         }
 
-        // ricochet if it hits the right wall
+        // ricochet if it hits the left wall
         // this checks the left edge of the ball
         if ((int)System.Math.Round(ballCenterCurrCoordsX - ballRadius) <= 0) {
             // this flips the sign, so it turns it into a positive
             ballDeltaX = -ballDeltaX;
         }
         
+        // ricochet if it hits the top wall
         // this checks the top edge of the ball
         if ((int)System.Math.Round(ballCenterCurrCoordsY - ballRadius) <= 0) {
             // this flips the sign, so it turns it into a negative
             ballDeltaY = -ballDeltaY;
         }
 
+        // ricochet if it hits the bottom wall
         // this check the bottom edge of the ball
         if ((int)System.Math.Round(ballCenterCurrCoordsY + ballRadius) >= ballHeight) {
             // this flips the sign, so it turns it into a positive
