@@ -302,13 +302,15 @@ public class RicochetBall : Form {
     }
 
     private void textFilled(object sender, EventArgs events) {
+        // itll always stop showing the ball & coords whenever the text gets messed with
+        showBall = false;
+        ballPanel.displayBall(showBall);
+        enterXCoords.Text = "";
+        enterYCoords.Text = "";
+
         if (Double.TryParse(enterSpeed.Text, out speed1) == false ||
             Double.TryParse(enterDirection.Text, out dir1) == false ||
             speed1 < 0) {
-            showBall = false;
-            ballPanel.displayBall(showBall);
-            enterXCoords.Text = "";
-            enterYCoords.Text = "";
             initial.Enabled = false;
             start.Enabled = false;
             return;
@@ -319,20 +321,12 @@ public class RicochetBall : Form {
             // this updates any new changes into the variables
             userBallSpeed = speed1;
             userBallDirection = dir1;
-            ballCenterCurrCoordsX = ballCenterInitialCoordsX;
-            ballCenterCurrCoordsY = ballCenterInitialCoordsY;
-            enterXCoords.Text = ballCenterInitialCoordsX.ToString("F2");
-            enterYCoords.Text = ballCenterInitialCoordsY.ToString("F2");
-
-            showBall = true;
-            ballPanel.displayBall(showBall);
 
             pixelPerTic = userBallSpeed/ballClockRate;
 
             // this calculates the movement of x and y
             ballDeltaX = pixelPerTic * Math.Cos(userBallDirection * Math.PI/180.0);
             ballDeltaY = pixelPerTic * Math.Sin(userBallDirection * Math.PI/180.0);
-
 
             initial.Enabled = true;
             // always increases so the user needs to click initialize every time before clicking start
@@ -342,6 +336,15 @@ public class RicochetBall : Form {
     }
 
     protected void initClick(Object sender, EventArgs events) {
+        // the ball and coords get displayed AFTER the user clicks on the button
+        ballCenterCurrCoordsX = ballCenterInitialCoordsX;
+        ballCenterCurrCoordsY = ballCenterInitialCoordsY;
+        enterXCoords.Text = ballCenterInitialCoordsX.ToString("F2");
+        enterYCoords.Text = ballCenterInitialCoordsY.ToString("F2");
+        
+        showBall = true;
+        ballPanel.displayBall(showBall);
+
         start.Enabled = true;
     }
 
