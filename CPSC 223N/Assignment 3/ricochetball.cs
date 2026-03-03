@@ -5,7 +5,7 @@
     Assignment:  3
     Program:  Ricochet Ball
     Due:  March 8, 2026 @ 11:59pm
-    Course:  CPSC223N
+    Course:  CPSC223N-1
     Languages: C# & Bash
     Purpose: To animate a ball that ricochets off of a wall. It's speed and direction 
     of the ball is determined by the user's input.
