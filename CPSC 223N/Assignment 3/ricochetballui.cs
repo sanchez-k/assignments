@@ -5,7 +5,7 @@
     Assignment:  3
     Program:  Ricochet Ball
     Due:  March 8, 2026 @ 11:59pm
-    Course:  CPSC223N
+    Course:  CPSC223N-1
     Languages: C# & Bash
     Purpose: To animate a ball that ricochets off of a wall. It's speed and direction 
     of the ball is determined by the user's input.
@@ -56,6 +56,10 @@ public class RicochetBall : Form {
     // Size of the ball
     private const double ballRadius = 12.65;
 
+    // where the ball starts each time
+    private static double ballCenterInitialCoordsX = formWidth / 2;
+    private static double ballCenterInitialCoordsY = ballHeight / 2;
+
     // Speed variables
     // How far should the ball move each time the timer tics
     private double pixelPerTic;
@@ -93,9 +97,11 @@ public class RicochetBall : Form {
     // used to check if the user changed any text
     private static double speed1 = 0.0;
     private static double dir1 = 0.0;
+    private static int check = 0;
+
+    // used to update the coords
     private static double x1 = 0.0;
     private static double y1 = 0.0;
-    private static int check = 0;
 
     public RicochetBall() {
         // Setting up the UI
@@ -162,6 +168,7 @@ public class RicochetBall : Form {
         enterDirection.Location = new Point(quit.Left, initial.Top);
         enterDirection.Text = "";
         enterDirection.Font = new Font("Georgia", 20, FontStyle.Regular);
+        enterDirection.BackColor = Color.White;
         Controls.Add(enterDirection);
 
         direction.Size = new Size(350, 45);
@@ -177,6 +184,7 @@ public class RicochetBall : Form {
         enterSpeed.Location = new Point(this.direction.Left - enterSpeed.Width - objMargin, initial.Top);
         enterSpeed.Text = "";
         enterSpeed.Font = new Font("Georgia", 20, FontStyle.Regular);
+        enterSpeed.BackColor = Color.White;
         Controls.Add(enterSpeed);
 
         speed.Size = new Size(370, 45);
@@ -193,6 +201,8 @@ public class RicochetBall : Form {
         enterYCoords.Location = new Point(quit.Left - enterYCoords.Width - objMargin, quit.Top);
         enterYCoords.Text = "";
         enterYCoords.Font = new Font("Georgia", 20, FontStyle.Regular);
+        enterYCoords.ReadOnly = true;
+        enterYCoords.BackColor = Color.White;
         Controls.Add(enterYCoords);
 
         yCoords.Size = new Size(50, 45);
@@ -208,6 +218,8 @@ public class RicochetBall : Form {
         enterXCoords.Location = new Point(yCoords.Left - enterXCoords.Width - objMargin, quit.Top);
         enterXCoords.Text = "";
         enterXCoords.Font = new Font("Georgia", 20, FontStyle.Regular);
+        enterXCoords.ReadOnly = true;
+        enterXCoords.BackColor = Color.White;
         Controls.Add(enterXCoords);
 
         xCoords.Size = new Size(50, 45);
@@ -265,8 +277,6 @@ public class RicochetBall : Form {
         // but you write stuff in it instead
         enterSpeed.TextChanged += textFilled;
         enterDirection.TextChanged += textFilled;
-        enterXCoords.TextChanged += textFilled;
-        enterYCoords.TextChanged += textFilled;
     }
 
     protected void startClick(Object sender, EventArgs events) {
@@ -291,7 +301,6 @@ public class RicochetBall : Form {
             enterSpeed.Enabled = true;
             enterXCoords.Enabled = true;
             enterYCoords.Enabled = true;
-            initial.Enabled = true;
         }
         bothClocksStopped = !bothClocksStopped;
     }
@@ -299,21 +308,11 @@ public class RicochetBall : Form {
     private void textFilled(object sender, EventArgs events) {
         if (Double.TryParse(enterSpeed.Text, out speed1) == false ||
             Double.TryParse(enterDirection.Text, out dir1) == false ||
-            Double.TryParse(enterXCoords.Text, out x1) == false ||
-            Double.TryParse(enterYCoords.Text, out y1) == false ||
             speed1 < 0 || x1 < 0 || y1 < 0) {
-
-            if (Double.TryParse(enterXCoords.Text, out ballCenterCurrCoordsX) == true &&
-                Double.TryParse(enterYCoords.Text, out ballCenterCurrCoordsY) == true &&
-                ballCenterCurrCoordsX >= 0 && ballCenterCurrCoordsY >= 0) {
-                showBall = true;
-                ballPanel.displayBall(showBall);
-
-            } else {
-                showBall = false;
-                ballPanel.displayBall(showBall);
-            }
-
+            showBall = false;
+            ballPanel.displayBall(showBall);
+            enterXCoords.Text = "";
+            enterYCoords.Text = "";
             initial.Enabled = false;
             return;
         } else {
@@ -323,8 +322,10 @@ public class RicochetBall : Form {
             // this updates any new changes into the variables
             userBallSpeed = speed1;
             userBallDirection = dir1;
-            ballCenterCurrCoordsX = x1;
-            ballCenterCurrCoordsY = y1;
+            ballCenterCurrCoordsX = ballCenterInitialCoordsX;
+            ballCenterCurrCoordsY = ballCenterInitialCoordsY;
+            enterXCoords.Text = ballCenterInitialCoordsX.ToString();
+            enterYCoords.Text = ballCenterInitialCoordsY.ToString();
 
             showBall = true;
             ballPanel.displayBall(showBall);
@@ -353,7 +354,9 @@ public class RicochetBall : Form {
 
     protected void updateBallCoords(System.Object sender, ElapsedEventArgs events) {
         ballCenterCurrCoordsX += ballDeltaX;
-        ballCenterCurrCoordsY -= ballDeltaY;  
+        ballCenterCurrCoordsY -= ballDeltaY;
+        enterXCoords.Text = ballCenterCurrCoordsX.ToString("F2");
+        enterYCoords.Text = ballCenterCurrCoordsY.ToString("F2");
 
         // ricochet if it hits the right wall
         // center + radius checks the right edge of the ball
@@ -389,7 +392,6 @@ public class RicochetBall : Form {
     // prof didnt need a graphic panel since the whole UI, in ricochet ball, was drawn
     // a graphic panel is needed if i want to confine the drawing and separate the code
     public class GraphicPanel : Panel {
-        // maybe change the color???
         private Color ballColor = ColorTranslator.FromHtml("#DFFF82");
         private bool ballShown = false;
 
