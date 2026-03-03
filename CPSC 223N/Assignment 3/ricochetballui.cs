@@ -310,6 +310,7 @@ public class RicochetBall : Form {
             enterXCoords.Text = "";
             enterYCoords.Text = "";
             initial.Enabled = false;
+            start.Enabled = false;
             return;
         } else {
             if (check >= 1) {
@@ -320,8 +321,8 @@ public class RicochetBall : Form {
             userBallDirection = dir1;
             ballCenterCurrCoordsX = ballCenterInitialCoordsX;
             ballCenterCurrCoordsY = ballCenterInitialCoordsY;
-            enterXCoords.Text = ballCenterInitialCoordsX.ToString();
-            enterYCoords.Text = ballCenterInitialCoordsY.ToString();
+            enterXCoords.Text = ballCenterInitialCoordsX.ToString("F2");
+            enterYCoords.Text = ballCenterInitialCoordsY.ToString("F2");
 
             showBall = true;
             ballPanel.displayBall(showBall);
