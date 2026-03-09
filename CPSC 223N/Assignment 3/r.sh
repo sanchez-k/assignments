@@ -28,7 +28,6 @@ echo View the list of files in the current folder
 ls -l
 
 echo Run the Assignment 3 program.
-# mono makes it able to run .NET apps (stuff written in C#)
-mono ./ricochetball.exe
+./ricochetball.exe
 
 echo The script has terminated.
