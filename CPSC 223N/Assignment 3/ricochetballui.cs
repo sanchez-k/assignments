@@ -396,6 +396,12 @@ public class RicochetBall : Form {
     public class GraphicPanel : Panel {
         private Color ballColor = ColorTranslator.FromHtml("#DFFF82");
         private bool ballShown = false;
+        private Brush colorfulBrush;
+
+        // so no mem corruption happens
+        public GraphicPanel() {
+            colorfulBrush = new SolidBrush(ballColor);
+        }
 
         public void displayBall(bool ans) {
             ballShown = ans;
@@ -409,7 +415,6 @@ public class RicochetBall : Form {
             if (ballShown == true) {    
                 ballUpperLeftCurrCoordsX = ballCenterCurrCoordsX - ballRadius;
                 ballUpperLeftCurrCoordsY = ballCenterCurrCoordsY - ballRadius;
-                Brush colorfulBrush = new SolidBrush(ballColor);
                 graph.FillEllipse(colorfulBrush,
                                 (int)ballUpperLeftCurrCoordsX,
                                 (int)ballUpperLeftCurrCoordsY,
