@@ -112,6 +112,10 @@ public class CatMouse : Form {
     private static double userCatSpeed = 0.0;
     private static int num = 0;
     private static bool ballsColliding = false;
+    private int hits = 0;
+    // all one line
+    //Math.Pow(catDeltaX - mouseDeltaX, 2) + Math.Pow(catDeltaY - mouseDeltaY, 2)
+    private static double distanceFormula = Math.Sqrt(Math.Pow(catCenterCurrCoordsX - mouseCenterCurrCoordsX, 2) + Math.Pow(catCenterCurrCoordsY - mouseCenterCurrCoordsY, 2));
 
     public CatMouse() {
         // Setting up the UI
@@ -159,22 +163,30 @@ public class CatMouse : Form {
 
 
         // Now the rest of the labels & textboxes
-        mouseSpeed.Size = new Size(350, 45);
-        mouseSpeed.Location = new Point(start.Right + objMargin, start.Top - 5);
-        mouseSpeed.Text = "Enter Mouse Speed (p/s)";
-        mouseSpeed.TextAlign = ContentAlignment.MiddleCenter;
-        mouseSpeed.Font = new Font("Georgia", 20, FontStyle.Bold);
-        mouseSpeed.BackColor = ColorTranslator.FromHtml("#CF8969");
-        Controls.Add(mouseSpeed);
-
-        catSpeed.Size = new Size(360, 45);
-        catSpeed.Location = new Point(mouseSpeed.Right + objMargin, mouseSpeed.Top);
+        catSpeed.Size = new Size(290, 45);
+        catSpeed.Location = new Point(start.Right + objMargin, start.Top - 5);
         catSpeed.Text = "Enter Cat Speed (p/s)";
         catSpeed.TextAlign = ContentAlignment.MiddleCenter;
         catSpeed.Font = new Font("Georgia", 20, FontStyle.Bold);
         catSpeed.BackColor = ColorTranslator.FromHtml("#CF8969");
         Controls.Add(catSpeed);
 
+        mouseSpeed.Size = new Size(330, 45);
+        mouseSpeed.Location = new Point(catSpeed.Right + objMargin, catSpeed.Top);
+        mouseSpeed.Text = "Enter Mouse Speed (p/s)";
+        mouseSpeed.TextAlign = ContentAlignment.MiddleCenter;
+        mouseSpeed.Font = new Font("Georgia", 20, FontStyle.Bold);
+        mouseSpeed.BackColor = ColorTranslator.FromHtml("#CF8969");
+        Controls.Add(mouseSpeed);
+
+
+        enterCatSpeed.Size = new Size(200, 45);
+        enterCatSpeed.Location = new Point(catSpeed.Left + catSpeed.Width / 2 - enterCatSpeed.Width / 2, catSpeed.Bottom + tinyMargin);
+        enterCatSpeed.Text = "";
+        enterCatSpeed.TextAlign = HorizontalAlignment.Center;
+        enterCatSpeed.Font = new Font("Georgia", 20, FontStyle.Regular);
+        enterCatSpeed.BackColor = Color.White;
+        Controls.Add(enterCatSpeed);
 
         enterMouseSpeed.Size = new Size(200, 45);
         enterMouseSpeed.Location = new Point(mouseSpeed.Left + mouseSpeed.Width / 2 - enterMouseSpeed.Width / 2, mouseSpeed.Bottom + tinyMargin);
@@ -184,42 +196,8 @@ public class CatMouse : Form {
         enterMouseSpeed.BackColor = Color.White;
         Controls.Add(enterMouseSpeed);
 
-        enterCatSpeed.Size = new Size(200, 45);
-        enterCatSpeed.Location = new Point(catSpeed.Left + catSpeed.Width / 2 - enterCatSpeed.Width / 2, mouseSpeed.Bottom + tinyMargin);
-        enterCatSpeed.Text = "";
-        enterCatSpeed.TextAlign = HorizontalAlignment.Center;
-        enterCatSpeed.Font = new Font("Georgia", 20, FontStyle.Regular);
-        enterCatSpeed.BackColor = Color.White;
-        Controls.Add(enterCatSpeed);
-
-
-        enterMouseCoords.Size = new Size(200, 45);
-        enterMouseCoords.Location = new Point(enterMouseSpeed.Left, quit.Top + 5);
-        enterMouseCoords.Text = $"({mouseCenterInitialCoordsX}, {mouseCenterInitialCoordsY})";
-        enterMouseCoords.TextAlign = HorizontalAlignment.Center;
-        enterMouseCoords.Font = new Font("Georgia", 20, FontStyle.Regular);
-        enterMouseCoords.ReadOnly = true;
-        enterMouseCoords.BackColor = Color.White;
-        Controls.Add(enterMouseCoords);
-
-        mouseCoords.Size = new Size(240, 45);
-        mouseCoords.Location = new Point(mouseSpeed.Left + mouseSpeed.Width / 2 - mouseCoords.Width / 2, enterMouseCoords.Top - mouseCoords.Height - tinyMargin);
-        mouseCoords.Text = "Mouse Location";
-        mouseCoords.TextAlign = ContentAlignment.MiddleCenter;
-        mouseCoords.Font = new Font("Georgia", 20, FontStyle.Bold);
-        mouseCoords.BackColor = ColorTranslator.FromHtml("#CF8969");
-        Controls.Add(mouseCoords);
-
-        catCoords.Size = new Size(250, 45);
-        catCoords.Location = new Point(catSpeed.Left + catSpeed.Width / 2 - catCoords.Width / 2, mouseCoords.Top);
-        catCoords.Text = "Cat Location";
-        catCoords.TextAlign = ContentAlignment.MiddleCenter;
-        catCoords.Font = new Font("Georgia", 20, FontStyle.Bold);
-        catCoords.BackColor = ColorTranslator.FromHtml("#CF8969");
-        Controls.Add(catCoords);
-
         enterCatCoords.Size = new Size(200, 45);
-        enterCatCoords.Location = new Point(enterCatSpeed.Left, enterMouseCoords.Top);
+        enterCatCoords.Location = new Point(enterCatSpeed.Left, quit.Top + 5);
         enterCatCoords.Text = $"({catCenterInitialCoordsX}, {catCenterInitialCoordsY})";
         enterCatCoords.TextAlign = HorizontalAlignment.Center;
         enterCatCoords.Font = new Font("Georgia", 20, FontStyle.Regular);
@@ -227,10 +205,36 @@ public class CatMouse : Form {
         enterCatCoords.BackColor = Color.White;
         Controls.Add(enterCatCoords);
 
+        enterMouseCoords.Size = new Size(200, 45);
+        enterMouseCoords.Location = new Point(enterMouseSpeed.Left, enterCatCoords.Top);
+        enterMouseCoords.Text = $"({mouseCenterInitialCoordsX}, {mouseCenterInitialCoordsY})";
+        enterMouseCoords.TextAlign = HorizontalAlignment.Center;
+        enterMouseCoords.Font = new Font("Georgia", 20, FontStyle.Regular);
+        enterMouseCoords.ReadOnly = true;
+        enterMouseCoords.BackColor = Color.White;
+        Controls.Add(enterMouseCoords);
+
+        catCoords.Size = new Size(220, 45);
+        catCoords.Location = new Point(catSpeed.Left + catSpeed.Width / 2 - catCoords.Width / 2, enterCatCoords.Top - catCoords.Height - tinyMargin);
+        catCoords.Text = "Cat Location";
+        catCoords.TextAlign = ContentAlignment.MiddleCenter;
+        catCoords.Font = new Font("Georgia", 20, FontStyle.Bold);
+        catCoords.BackColor = ColorTranslator.FromHtml("#CF8969");
+        Controls.Add(catCoords);
+
+        mouseCoords.Size = new Size(240, 45);
+        mouseCoords.Location = new Point(mouseSpeed.Left + mouseSpeed.Width / 2 - mouseCoords.Width / 2, catCoords.Top);
+        mouseCoords.Text = "Mouse Location";
+        mouseCoords.TextAlign = ContentAlignment.MiddleCenter;
+        mouseCoords.Font = new Font("Georgia", 20, FontStyle.Bold);
+        mouseCoords.BackColor = ColorTranslator.FromHtml("#CF8969");
+        Controls.Add(mouseCoords);
+
+
 
         
         mouseDirection.Size = new Size(390, 45);
-        mouseDirection.Location = new Point(catSpeed.Right + objMargin, mouseSpeed.Top);
+        mouseDirection.Location = new Point(mouseSpeed.Right + objMargin, mouseSpeed.Top);
         mouseDirection.Text = "Enter mouse initial direction";
         mouseDirection.TextAlign = ContentAlignment.MiddleCenter;
         mouseDirection.Font = new Font("Georgia", 20, FontStyle.Bold);
@@ -246,11 +250,9 @@ public class CatMouse : Form {
         Controls.Add(enterMouseDirection);
 
 
-
-
         enterDistance.Size = new Size(200, 45);
         enterDistance.Location = new Point(enterMouseDirection.Left, enterMouseCoords.Top);
-        enterDistance.Text = $"({catCenterInitialCoordsX}, {catCenterInitialCoordsY})";
+        enterDistance.Text = $"{distanceFormula:F2}";;
         enterDistance.TextAlign = HorizontalAlignment.Center;
         enterDistance.Font = new Font("Georgia", 20, FontStyle.Regular);
         enterDistance.ReadOnly = true;
@@ -315,6 +317,8 @@ public class CatMouse : Form {
             enterCatSpeed.Enabled = false;
             enterMouseCoords.Enabled = false;
             enterCatCoords.Enabled = false;
+            enterMouseDirection.Enabled = false;
+            enterDistance.Enabled = false;
 
 
             pixelPerTic = userMouseSpeed/ballClockRate;
@@ -340,23 +344,29 @@ public class CatMouse : Form {
             enterCatSpeed.Enabled = true;
             enterMouseCoords.Enabled = true;
             enterCatCoords.Enabled = true;
+            enterMouseDirection.Enabled = true;
+            enterDistance.Enabled = true;
         }
         bothClocksStopped = !bothClocksStopped;
     }
 
     private void textFilled(object sender, EventArgs events) {
+        double moussee = 0;
         enterMouseCoords.Text = $"({mouseCenterInitialCoordsX}, {mouseCenterInitialCoordsY})";
         enterCatCoords.Text = $"({catCenterInitialCoordsX}, {catCenterInitialCoordsY})";
         mouseCenterCurrCoordsX = mouseCenterInitialCoordsX;
         mouseCenterCurrCoordsY = mouseCenterInitialCoordsY;
         catCenterCurrCoordsX = catCenterInitialCoordsX;
         catCenterCurrCoordsY = catCenterInitialCoordsY;
+        distanceFormula = Math.Sqrt(Math.Pow(catCenterCurrCoordsX - mouseCenterCurrCoordsX, 2) + Math.Pow(catCenterCurrCoordsY - mouseCenterCurrCoordsY, 2));
+        enterDistance.Text = $"{distanceFormula:F2}";
         start.Text = "Start";
         num = 0;
         ballPanel.ballCollision(num);
 
         if (Double.TryParse(enterMouseSpeed.Text, out userMouseSpeed) == false ||
             Double.TryParse(enterCatSpeed.Text, out userCatSpeed) == false ||
+            Double.TryParse(enterMouseDirection.Text, out moussee) == false ||
             userMouseSpeed < 0 || userCatSpeed < 0) {
             start.Enabled = false;
             return;
@@ -376,6 +386,9 @@ public class CatMouse : Form {
         catCenterCurrCoordsY += catDeltaY;
         enterMouseCoords.Text = $"({mouseCenterCurrCoordsX:F0}, {mouseCenterCurrCoordsY:F0})";
         enterCatCoords.Text = $"({catCenterCurrCoordsX:F0}, {catCenterCurrCoordsY:F0})";
+
+        distanceFormula = Math.Sqrt(Math.Pow(catCenterCurrCoordsX - mouseCenterCurrCoordsX, 2) + Math.Pow(catCenterCurrCoordsY - mouseCenterCurrCoordsY, 2));
+        enterDistance.Text = $"{distanceFormula:F2}";
 
         // Red ball
         // ricochet if it hits the right wall
