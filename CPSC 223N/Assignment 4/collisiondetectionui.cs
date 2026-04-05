@@ -78,7 +78,7 @@ public class CollisionDetection : Form {
     private static double mouseUpperLeftCurrCoordsY;
 
     // Declaring data about the blue ball
-    private const double catRadius = 16.65;
+    private const double catRadius = 12.65;
 
     private static double catCenterInitialCoordsX = formWidth / 4;
     private static double catCenterInitialCoordsY = ballHeight / 2;
@@ -114,13 +114,7 @@ public class CollisionDetection : Form {
     private bool bothClocksStopped = true;
     private static double userMouseSpeed = 0.0;
     private static double userCatSpeed = 0.0;
-    private static int num = 0;
-    private static bool ballsColliding = false;
-    private int hits = 0;
-    private static int ricochetWall = 0;
-    private static int prevRicochetWall = 0;
     private static double userMouseDirection = 0;
-    private static double lengthBetween = 0;
     // all one line
     private static double distanceFormula = Math.Sqrt(Math.Pow(catCenterCurrCoordsX - mouseCenterCurrCoordsX, 2) + Math.Pow(catCenterCurrCoordsY - mouseCenterCurrCoordsY, 2));
 
@@ -164,14 +158,14 @@ public class CollisionDetection : Form {
         reset.Text = "Reset";
         reset.TextAlign = ContentAlignment.MiddleCenter;
         reset.Font = new Font("Georgia", 20, FontStyle.Bold);
-        reset.BackColor = ColorTranslator.FromHtml("#CF697B");
+        reset.BackColor = ColorTranslator.FromHtml("#8E69CF");
         reset.Enabled = true;
         reset.Click += new EventHandler(resetClick);
         Controls.Add(reset);
         // ✧ദ്ദി( ˶^ᗜ^˶ )
 
 
-        title.Size = new Size(610, 50);
+        title.Size = new Size(710, 50);
         title.Location = new Point((formWidth - title.Width) / 2, (titleHeight / 2) - (title.Height / 2));
         title.Text = "Collision Detection by Kassandra Sanchez";
         title.TextAlign = ContentAlignment.MiddleCenter;
@@ -182,17 +176,17 @@ public class CollisionDetection : Form {
 
 
         // Now the rest of the labels & textboxes
-        catSpeed.Size = new Size(290, 45);
+        catSpeed.Size = new Size(300, 45);
         catSpeed.Location = new Point(start.Right + objMargin, start.Top - 5);
-        catSpeed.Text = "Enter Cat Speed (p/s)";
+        catSpeed.Text = "Enter Blue Ball Speed (p/s)";
         catSpeed.TextAlign = ContentAlignment.MiddleCenter;
         catSpeed.Font = new Font("Georgia", 20, FontStyle.Bold);
         catSpeed.BackColor = ColorTranslator.FromHtml("#CF8969");
         Controls.Add(catSpeed);
 
-        mouseSpeed.Size = new Size(330, 45);
+        mouseSpeed.Size = new Size(350, 45);
         mouseSpeed.Location = new Point(catSpeed.Right + objMargin, catSpeed.Top);
-        mouseSpeed.Text = "Enter Mouse Speed (p/s)";
+        mouseSpeed.Text = "Enter Red Ball Speed (p/s)";
         mouseSpeed.TextAlign = ContentAlignment.MiddleCenter;
         mouseSpeed.Font = new Font("Georgia", 20, FontStyle.Bold);
         mouseSpeed.BackColor = ColorTranslator.FromHtml("#CF8969");
@@ -233,9 +227,9 @@ public class CollisionDetection : Form {
         enterMouseCoords.BackColor = Color.White;
         Controls.Add(enterMouseCoords);
 
-        catCoords.Size = new Size(220, 45);
+        catCoords.Size = new Size(250, 45);
         catCoords.Location = new Point(catSpeed.Left + catSpeed.Width / 2 - catCoords.Width / 2, enterCatCoords.Top - catCoords.Height - tinyMargin);
-        catCoords.Text = "Cat Location";
+        catCoords.Text = "Blue Ball Location";
         catCoords.TextAlign = ContentAlignment.MiddleCenter;
         catCoords.Font = new Font("Georgia", 20, FontStyle.Bold);
         catCoords.BackColor = ColorTranslator.FromHtml("#CF8969");
@@ -243,7 +237,7 @@ public class CollisionDetection : Form {
 
         mouseCoords.Size = new Size(240, 45);
         mouseCoords.Location = new Point(mouseSpeed.Left + mouseSpeed.Width / 2 - mouseCoords.Width / 2, catCoords.Top);
-        mouseCoords.Text = "Mouse Location";
+        mouseCoords.Text = "Red Ball Location";
         mouseCoords.TextAlign = ContentAlignment.MiddleCenter;
         mouseCoords.Font = new Font("Georgia", 20, FontStyle.Bold);
         mouseCoords.BackColor = ColorTranslator.FromHtml("#CF8969");
@@ -441,28 +435,24 @@ public class CollisionDetection : Form {
         if ((int)System.Math.Round(mouseCenterCurrCoordsX + mouseRadius) >= this.ClientSize.Width) {
             // this makes deltaX a negative
             mouseDeltaX = -mouseDeltaX;
-            ricochetWall++;
         }
 
         // ricochet if it hits the left wall
         if ((int)System.Math.Round(mouseCenterCurrCoordsX - mouseRadius) <= 0) {
             // this flips the sign, so it turns it into a positive
             mouseDeltaX = -mouseDeltaX;
-            ricochetWall++;
         }
         
         // ricochet if it hits the top wall
         if ((int)System.Math.Round(mouseCenterCurrCoordsY - mouseRadius) <= 0) {
             // this flips the sign, so it turns it into a negative
             mouseDeltaY = -mouseDeltaY;
-            ricochetWall++;
         }
 
         // ricochet if it hits the bottom wall
         if ((int)System.Math.Round(mouseCenterCurrCoordsY + mouseRadius) >= ballHeight) {
             // this flips the sign, so it turns it into a positive
             mouseDeltaY = -mouseDeltaY;
-            ricochetWall++;
         }
 
         // Blue ball
@@ -560,5 +550,4 @@ public class CollisionDetection : Form {
     }
 }
 
-// update distance
 // remove enter mouse dir
