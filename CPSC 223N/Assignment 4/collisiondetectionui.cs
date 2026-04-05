@@ -124,6 +124,9 @@ public class CollisionDetection : Form {
     // all one line
     private static double distanceFormula = Math.Sqrt(Math.Pow(catCenterCurrCoordsX - mouseCenterCurrCoordsX, 2) + Math.Pow(catCenterCurrCoordsY - mouseCenterCurrCoordsY, 2));
 
+    private static System.Windows.Forms.Timer distanceClock = new System.Windows.Forms.Timer();
+    private static System.Windows.Forms.Timer coordsClock = new System.Windows.Forms.Timer();
+
     public CollisionDetection() {
         // Setting up the UI
         Text = "Cat and Mouse";
@@ -166,7 +169,6 @@ public class CollisionDetection : Form {
         reset.Enabled = true;
         reset.Click += new EventHandler(resetClick);
         Controls.Add(reset);
-        CancelButton = reset;
         // ✧ദ്ദി( ˶^ᗜ^˶ )
 
 
@@ -311,6 +313,16 @@ public class CollisionDetection : Form {
         uiRefreshClock.Interval = (int)System.Math.Round(1000.0 / uiRefreshRate);;
         uiRefreshClock.Elapsed += new ElapsedEventHandler(refreshUI);
 
+
+        distanceClock.Interval = 100;
+        distanceClock.Tick += new System.EventHandler(timerDistance);
+        coordsClock.Interval = 150;
+        coordsClock.Tick += new System.EventHandler(timerCoords);
+
+
+
+
+
         //Prepare the ball clock.  A button will start this clock ticking.
         ballClock.Enabled = false;
         // you need the 1000 to make it around 17.09 ms which is almost 60 fps
@@ -329,6 +341,8 @@ public class CollisionDetection : Form {
             start.Text = "Pause";
             uiRefreshClock.Enabled = true;
             ballClock.Enabled = true;
+            distanceClock.Start();
+            coordsClock.Start();
 
             // Ensuring that these can't be messed with while the ball is moving
             enterMouseSpeed.Enabled = false;
@@ -351,6 +365,8 @@ public class CollisionDetection : Form {
         } else {
             uiRefreshClock.Enabled = false;
             ballClock.Enabled = false;
+            distanceClock.Stop();
+            coordsClock.Stop();
             start.Text = "Resume";
 
             // re-enabling these back
@@ -424,11 +440,22 @@ public class CollisionDetection : Form {
         mouseCenterCurrCoordsY -= mouseDeltaY;
         catCenterCurrCoordsX += catDeltaX;
         catCenterCurrCoordsY += catDeltaY;
-        enterMouseCoords.Text = $"({mouseCenterCurrCoordsX:F0}, {mouseCenterCurrCoordsY:F0})";
-        enterCatCoords.Text = $"({catCenterCurrCoordsX:F0}, {catCenterCurrCoordsY:F0})";
-
+        //enterMouseCoords.Text = $"({mouseCenterCurrCoordsX:F0}, {mouseCenterCurrCoordsY:F0})";
+        //enterCatCoords.Text = $"({catCenterCurrCoordsX:F0}, {catCenterCurrCoordsY:F0})";
+        
+        
+        /*var timer = new System.Windows.Forms.Timer();
+        timer.Interval = 100; // milliseconds
+        timer.Tick += (s, e) =>
+        {
+            distanceFormula = Math.Sqrt(Math.Pow(catCenterCurrCoordsX - mouseCenterCurrCoordsX, 2) + Math.Pow(catCenterCurrCoordsY - mouseCenterCurrCoordsY, 2));
+            enterDistance.Text = $"{distanceFormula:F2}";
+        };
+        timer.Start();*/
         //distanceFormula = Math.Sqrt(Math.Pow(catCenterCurrCoordsX - mouseCenterCurrCoordsX, 2) + Math.Pow(catCenterCurrCoordsY - mouseCenterCurrCoordsY, 2));
-        enterDistance.Text = $"{distanceFormula:F2}";
+        //enterDistance.Text = $"{distanceFormula:F2}";
+
+
 
         // Red ball
         // ricochet if it hits the right wall
@@ -487,6 +514,7 @@ public class CollisionDetection : Form {
             start.PerformClick();
             start.Enabled = false;
             start.Text = "Start";
+            enterDistance.Text = "0";
             enterMouseSpeed.Enabled = false;
             enterCatSpeed.Enabled = false;
             enterMouseCoords.Enabled = false;
@@ -498,6 +526,16 @@ public class CollisionDetection : Form {
 
     protected void refreshUI(System.Object sender, ElapsedEventArgs even) {
         ballPanel.Invalidate();
+    }
+
+    protected void timerDistance(System.Object sender, EventArgs even) {
+        distanceFormula = Math.Sqrt(Math.Pow(catCenterCurrCoordsX - mouseCenterCurrCoordsX, 2) + Math.Pow(catCenterCurrCoordsY - mouseCenterCurrCoordsY, 2));
+        enterDistance.Text = $"{distanceFormula:F2}";
+    }
+
+    protected void timerCoords(System.Object sender, EventArgs even) {
+        enterMouseCoords.Text = $"({mouseCenterCurrCoordsX:F0}, {mouseCenterCurrCoordsY:F0})";
+        enterCatCoords.Text = $"({catCenterCurrCoordsX:F0}, {catCenterCurrCoordsY:F0})";
     }
 
     public class GraphicPanel : Panel {
