@@ -97,13 +97,15 @@ public class CatMouse : Form {
     private static System.Timers.Timer ballClock = new System.Timers.Timer();
     // How often the ball's coords gets updated
     // So it updates 60.5 times per second which is around 0.0165 seconds, itll add the deltas
-    private const double ballClockRate = 57.3;  //Units are Hz
+    private const double ballClockRate = 57.3;
+
+    // might need another clock for cat
 
     // Another timer object
     private static System.Timers.Timer uiRefreshClock = new System.Timers.Timer();
     // This updates how often the ball gets redrawn
     // Nums for both clocks should be diff because it can create a timing artifact
-    private const double uiRefreshRate = 60.8;  //Units are Hz = #refreshes per second
+    private const double uiRefreshRate = 60.8;
 
     private int objMargin = 40;
     private int tinyMargin = 10;
@@ -113,8 +115,11 @@ public class CatMouse : Form {
     private static int num = 0;
     private static bool ballsColliding = false;
     private int hits = 0;
+    private static int ricochetWall = 0;
+    private static int prevRicochetWall = 0;
+    private static double userMouseDirection = 0;
+    private static double lengthBetween = 0;
     // all one line
-    //Math.Pow(catDeltaX - mouseDeltaX, 2) + Math.Pow(catDeltaY - mouseDeltaY, 2)
     private static double distanceFormula = Math.Sqrt(Math.Pow(catCenterCurrCoordsX - mouseCenterCurrCoordsX, 2) + Math.Pow(catCenterCurrCoordsY - mouseCenterCurrCoordsY, 2));
 
     public CatMouse() {
@@ -320,20 +325,6 @@ public class CatMouse : Form {
             enterMouseDirection.Enabled = false;
             enterDistance.Enabled = false;
 
-
-            pixelPerTic = userMouseSpeed/ballClockRate;
-            catPixelPerTic = userCatSpeed/ballClockRate;
-            if (mouseCenterCurrCoordsX == mouseCenterInitialCoordsX &&
-                mouseCenterCurrCoordsY == mouseCenterInitialCoordsY &&
-                catCenterCurrCoordsX == catCenterInitialCoordsX &&
-                catCenterCurrCoordsY == catCenterInitialCoordsY) {
-                randoNum(pixelPerTic, catPixelPerTic);
-            }
-            
-
-
-
-
         } else {
             uiRefreshClock.Enabled = false;
             ballClock.Enabled = false;
@@ -351,7 +342,6 @@ public class CatMouse : Form {
     }
 
     private void textFilled(object sender, EventArgs events) {
-        double moussee = 0;
         enterMouseCoords.Text = $"({mouseCenterInitialCoordsX}, {mouseCenterInitialCoordsY})";
         enterCatCoords.Text = $"({catCenterInitialCoordsX}, {catCenterInitialCoordsY})";
         mouseCenterCurrCoordsX = mouseCenterInitialCoordsX;
@@ -362,16 +352,23 @@ public class CatMouse : Form {
         enterDistance.Text = $"{distanceFormula:F2}";
         start.Text = "Start";
         num = 0;
+        ricochetWall = 0;
         ballPanel.ballCollision(num);
 
         if (Double.TryParse(enterMouseSpeed.Text, out userMouseSpeed) == false ||
             Double.TryParse(enterCatSpeed.Text, out userCatSpeed) == false ||
-            Double.TryParse(enterMouseDirection.Text, out moussee) == false ||
+            Double.TryParse(enterMouseDirection.Text, out userMouseDirection) == false ||
             userMouseSpeed < 0 || userCatSpeed < 0) {
             start.Enabled = false;
             return;
         } else {
             start.Enabled = true;
+
+            pixelPerTic = userMouseSpeed/ballClockRate;
+            catPixelPerTic = userCatSpeed/ballClockRate;
+
+            mouseDeltaX = pixelPerTic * Math.Cos(userMouseDirection * Math.PI/180.0);
+            mouseDeltaY = pixelPerTic * Math.Sin(userMouseDirection * Math.PI/180.0);
         }
     }
 
@@ -380,6 +377,25 @@ public class CatMouse : Form {
     }
 
     protected void updateBallCoords(System.Object sender, ElapsedEventArgs events) {
+        //if (prevRicochetWall < ricochetWall) {
+            // change cat direction
+            catDeltaX = mouseCenterCurrCoordsX - catCenterCurrCoordsX * catPixelPerTic;
+            catDeltaY = mouseCenterCurrCoordsY - catCenterCurrCoordsY * catPixelPerTic;
+            
+            // need to find the length, to help determine the speed
+            lengthBetween = Math.Sqrt(catDeltaX * catDeltaX + catDeltaY * catDeltaY);
+
+            if (lengthBetween != 0) {
+                catDeltaX /= lengthBetween;
+                catDeltaY /= lengthBetween;
+            }
+
+            //catCenterCurrCoordsX += catDeltaX * userCatSpeed;
+            //catCenterCurrCoordsY += catDeltaX * userCatSpeed;
+        //}
+        
+
+
         mouseCenterCurrCoordsX += mouseDeltaX;
         mouseCenterCurrCoordsY -= mouseDeltaY;
         catCenterCurrCoordsX += catDeltaX;
@@ -395,24 +411,28 @@ public class CatMouse : Form {
         if ((int)System.Math.Round(mouseCenterCurrCoordsX + mouseRadius) >= this.ClientSize.Width) {
             // this makes deltaX a negative
             mouseDeltaX = -mouseDeltaX;
+            ricochetWall++;
         }
 
         // ricochet if it hits the left wall
         if ((int)System.Math.Round(mouseCenterCurrCoordsX - mouseRadius) <= 0) {
             // this flips the sign, so it turns it into a positive
             mouseDeltaX = -mouseDeltaX;
+            ricochetWall++;
         }
         
         // ricochet if it hits the top wall
         if ((int)System.Math.Round(mouseCenterCurrCoordsY - mouseRadius) <= 0) {
             // this flips the sign, so it turns it into a negative
             mouseDeltaY = -mouseDeltaY;
+            ricochetWall++;
         }
 
         // ricochet if it hits the bottom wall
         if ((int)System.Math.Round(mouseCenterCurrCoordsY + mouseRadius) >= ballHeight) {
             // this flips the sign, so it turns it into a positive
             mouseDeltaY = -mouseDeltaY;
+            ricochetWall++;
         }
 
         // Blue ball
@@ -499,7 +519,7 @@ public class CatMouse : Form {
         }
     }
 
-    protected void randoNum(double redPix, double bluePix) {
+    /*protected void randoNum(double redPix, double bluePix) {
         Random rando = new Random();
         double redNum = rando.Next(20, 361);
         double blueNum = rando.Next(20,361);
@@ -508,7 +528,7 @@ public class CatMouse : Form {
         mouseDeltaY = pixelPerTic * Math.Sin(redNum * Math.PI/180.0);
         catDeltaX = catPixelPerTic * Math.Cos(blueNum * Math.PI/180.0);
         catDeltaY = catPixelPerTic * Math.Sin(blueNum * Math.PI/180.0);
-    }
+    }*/
 }
 
 // enter direction
