@@ -35,14 +35,12 @@ public class CollisionDetection : Form {
     private Label mouseCoords = new Label();
     private Label catCoords = new Label();
     private Label distance = new Label();
-    private Label mouseDirection = new Label();
 
     private TextBox enterMouseSpeed = new TextBox();
     private TextBox enterCatSpeed = new TextBox();
     private TextBox enterMouseCoords = new TextBox();
     private TextBox enterCatCoords = new TextBox();
     private TextBox enterDistance = new TextBox();
-    private TextBox enterMouseDirection = new TextBox();
 
     private Button start = new Button();
     private Button quit = new Button();
@@ -243,42 +241,22 @@ public class CollisionDetection : Form {
         mouseCoords.BackColor = ColorTranslator.FromHtml("#CF8969");
         Controls.Add(mouseCoords);
 
-
-
-        
-        mouseDirection.Size = new Size(390, 45);
-        mouseDirection.Location = new Point(mouseSpeed.Right + objMargin, mouseSpeed.Top);
-        mouseDirection.Text = "Enter mouse initial direction";
-        mouseDirection.TextAlign = ContentAlignment.MiddleCenter;
-        mouseDirection.Font = new Font("Georgia", 20, FontStyle.Bold);
-        mouseDirection.BackColor = ColorTranslator.FromHtml("#CF8969");
-        Controls.Add(mouseDirection);
-
-        enterMouseDirection.Size = new Size(200, 45);
-        enterMouseDirection.Location = new Point(mouseDirection.Left + mouseDirection.Width / 2 - enterMouseDirection.Width / 2, mouseSpeed.Bottom + tinyMargin);
-        enterMouseDirection.Text = "";
-        enterMouseDirection.TextAlign = HorizontalAlignment.Center;
-        enterMouseDirection.Font = new Font("Georgia", 20, FontStyle.Regular);
-        enterMouseDirection.BackColor = Color.White;
-        Controls.Add(enterMouseDirection);
-
+        distance.Size = new Size(350, 45);
+        distance.Location = new Point(mouseSpeed.Right + objMargin, mouseSpeed.Top + (enterMouseCoords.Bottom - mouseSpeed.Top - (distance.Height + enterDistance.Height)) / 2);
+        distance.Text = "Distance between players";
+        distance.TextAlign = ContentAlignment.MiddleCenter;
+        distance.Font = new Font("Georgia", 20, FontStyle.Bold);
+        distance.BackColor = ColorTranslator.FromHtml("#CF8969");
+        Controls.Add(distance);
 
         enterDistance.Size = new Size(200, 45);
-        enterDistance.Location = new Point(enterMouseDirection.Left, enterMouseCoords.Top);
+        enterDistance.Location = new Point(distance.Left + distance.Width / 2 - enterDistance.Width / 2, distance.Bottom + tinyMargin);
         enterDistance.Text = $"{distanceFormula:F2}";;
         enterDistance.TextAlign = HorizontalAlignment.Center;
         enterDistance.Font = new Font("Georgia", 20, FontStyle.Regular);
         enterDistance.ReadOnly = true;
         enterDistance.BackColor = Color.White;
         Controls.Add(enterDistance);
-
-        distance.Size = new Size(350, 45);
-        distance.Location = new Point(enterDistance.Left + enterDistance.Width / 2 - distance.Width / 2, mouseCoords.Top);
-        distance.Text = "Distance between players";
-        distance.TextAlign = ContentAlignment.MiddleCenter;
-        distance.Font = new Font("Georgia", 20, FontStyle.Bold);
-        distance.BackColor = ColorTranslator.FromHtml("#CF8969");
-        Controls.Add(distance);
         // ദി(ᴗ _ᴗ ദി)
 
 
@@ -324,7 +302,6 @@ public class CollisionDetection : Form {
         // but you write stuff in it instead
         enterMouseSpeed.TextChanged += textFilled;
         enterCatSpeed.TextChanged += textFilled;
-        enterMouseDirection.TextChanged += textFilled;
     }
 
     protected void startClick(Object sender, EventArgs events) {
@@ -339,7 +316,6 @@ public class CollisionDetection : Form {
             enterCatSpeed.Enabled = false;
             enterMouseCoords.Enabled = false;
             enterCatCoords.Enabled = false;
-            enterMouseDirection.Enabled = false;
             enterDistance.Enabled = false;
             reset.Enabled = false;
 
@@ -363,7 +339,6 @@ public class CollisionDetection : Form {
             enterCatSpeed.Enabled = true;
             enterMouseCoords.Enabled = true;
             enterCatCoords.Enabled = true;
-            enterMouseDirection.Enabled = true;
             enterDistance.Enabled = true;
             reset.Enabled = true;
         }
@@ -386,7 +361,6 @@ public class CollisionDetection : Form {
         enterCatSpeed.Enabled = true;
         enterMouseCoords.Enabled = true;
         enterCatCoords.Enabled = true;
-        enterMouseDirection.Enabled = true;
         enterDistance.Enabled = true;
         reset.Enabled = true;
         ballPanel.Invalidate();
@@ -405,7 +379,6 @@ public class CollisionDetection : Form {
 
         if (Double.TryParse(enterMouseSpeed.Text, out userMouseSpeed) == false ||
             Double.TryParse(enterCatSpeed.Text, out userCatSpeed) == false ||
-            Double.TryParse(enterMouseDirection.Text, out userMouseDirection) == false ||
             userMouseSpeed < 0 || userCatSpeed < 0) {
             start.Enabled = false;
             return;
@@ -488,7 +461,6 @@ public class CollisionDetection : Form {
             enterCatSpeed.Enabled = false;
             enterMouseCoords.Enabled = false;
             enterCatCoords.Enabled = false;
-            enterMouseDirection.Enabled = false;
             enterDistance.Enabled = false;
         }
     }
@@ -550,4 +522,4 @@ public class CollisionDetection : Form {
     }
 }
 
-// remove enter mouse dir
+// make the balls actually touch
