@@ -81,7 +81,7 @@ public class CollisionDetection : Form {
     private static double mouseUpperLeftCurrCoordsY;
 
     // Declaring data about the blue ball
-    private const double catRadius = 12.65;
+    private const double catRadius = 16.65;
 
     private static double catCenterInitialCoordsX = formWidth / 4;
     private static double catCenterInitialCoordsY = ballHeight / 2;
@@ -105,6 +105,8 @@ public class CollisionDetection : Form {
     private const double ballClockRate = 57.3;
 
     // might need another clock for cat
+    private static System.Timers.Timer catClock = new System.Timers.Timer();
+    private const double catClockRate = 57.3;
 
     // Another timer object
     private static System.Timers.Timer uiRefreshClock = new System.Timers.Timer();
@@ -180,7 +182,7 @@ public class CollisionDetection : Form {
 
 
         // Now the rest of the labels & textboxes
-        catSpeed.Size = new Size(300, 45);
+        catSpeed.Size = new Size(320, 45);
         catSpeed.Location = new Point(start.Right + objMargin, start.Top - 5);
         catSpeed.Text = "Enter Blue Ball Speed (p/s)";
         catSpeed.TextAlign = ContentAlignment.MiddleCenter;
@@ -188,7 +190,7 @@ public class CollisionDetection : Form {
         catSpeed.BackColor = ColorTranslator.FromHtml("#CF8969");
         Controls.Add(catSpeed);
 
-        mouseSpeed.Size = new Size(350, 45);
+        mouseSpeed.Size = new Size(320, 45);
         mouseSpeed.Location = new Point(catSpeed.Right + objMargin, catSpeed.Top);
         mouseSpeed.Text = "Enter Red Ball Speed (p/s)";
         mouseSpeed.TextAlign = ContentAlignment.MiddleCenter;
@@ -231,7 +233,7 @@ public class CollisionDetection : Form {
         enterMouseCoords.BackColor = Color.White;
         Controls.Add(enterMouseCoords);
 
-        catCoords.Size = new Size(250, 45);
+        catCoords.Size = new Size(240, 45);
         catCoords.Location = new Point(catSpeed.Left + catSpeed.Width / 2 - catCoords.Width / 2, enterCatCoords.Top - catCoords.Height - tinyMargin);
         catCoords.Text = "Blue Ball Location";
         catCoords.TextAlign = ContentAlignment.MiddleCenter;
@@ -250,7 +252,7 @@ public class CollisionDetection : Form {
 
 
         
-        mouseDirection.Size = new Size(390, 45);
+        mouseDirection.Size = new Size(370, 45);
         mouseDirection.Location = new Point(mouseSpeed.Right + objMargin, mouseSpeed.Top);
         mouseDirection.Text = "Enter Direction Red (degrees)";
         mouseDirection.TextAlign = ContentAlignment.MiddleCenter;
@@ -268,7 +270,7 @@ public class CollisionDetection : Form {
 
 
 
-        blueDirection.Size = new Size(390, 45);
+        blueDirection.Size = new Size(380, 45);
         blueDirection.Location = new Point(mouseDirection.Right + objMargin, mouseSpeed.Top);
         blueDirection.Text = "Enter Direction Blue (degrees)";
         blueDirection.TextAlign = ContentAlignment.MiddleCenter;
@@ -294,7 +296,7 @@ public class CollisionDetection : Form {
         enterDistance.BackColor = Color.White;
         Controls.Add(enterDistance);
 
-        distance.Size = new Size(350, 45);
+        distance.Size = new Size(320, 45);
         distance.Location = new Point(enterDistance.Left + enterDistance.Width / 2 - distance.Width / 2, mouseCoords.Top);
         distance.Text = "Distance between players";
         distance.TextAlign = ContentAlignment.MiddleCenter;
@@ -339,8 +341,13 @@ public class CollisionDetection : Form {
         //Prepare the ball clock.  A button will start this clock ticking.
         ballClock.Enabled = false;
         // you need the 1000 to make it around 17.09 ms which is almost 60 fps
-        ballClock.Interval = (int)System.Math.Round(1000.0 / ballClockRate);
+        ballClock.Interval = (int)System.Math.Round(1000.0 / catClockRate);
         ballClock.Elapsed += new ElapsedEventHandler(updateBallCoords);
+
+        catClock.Enabled = false;
+        // you need the 1000 to make it around 17.09 ms which is almost 60 fps
+        catClock.Interval = (int)System.Math.Round(1000.0 / catClockRate);
+        catClock.Elapsed += new ElapsedEventHandler(updateBallCoords);
 
         // this hooks up any text changes to the function textFilled, kinda like a button
         // but you write stuff in it instead
@@ -355,6 +362,7 @@ public class CollisionDetection : Form {
             start.Text = "Pause";
             uiRefreshClock.Enabled = true;
             ballClock.Enabled = true;
+            catClock.Enabled = true;
             textClock.Start();
 
             // Ensuring that these can't be messed with while the ball is moving
@@ -370,6 +378,7 @@ public class CollisionDetection : Form {
         } else {
             uiRefreshClock.Enabled = false;
             ballClock.Enabled = false;
+            catClock.Enabled = false;
             textClock.Stop();
             start.Text = "Resume";
 
@@ -433,7 +442,7 @@ public class CollisionDetection : Form {
             start.Enabled = true;
 
             pixelPerTic = userMouseSpeed/ballClockRate;
-            catPixelPerTic = userCatSpeed/ballClockRate;
+            catPixelPerTic = userCatSpeed/catClockRate;
 
             mouseDeltaX = pixelPerTic * Math.Cos(userMouseDirection * Math.PI/180.0);
             mouseDeltaY = pixelPerTic * Math.Sin(userMouseDirection * Math.PI/180.0);
@@ -562,4 +571,6 @@ public class CollisionDetection : Form {
 }
 
 // he wants aother clock for the second ball
+    // might need to make a second updateballcoords because of the new clock
 // put initialize again
+// when it collides, put a message saying it collided or something
