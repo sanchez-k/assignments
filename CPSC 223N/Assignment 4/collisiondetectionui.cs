@@ -268,25 +268,8 @@ public class CollisionDetection : Form {
 
 
 
-        distance.Size = new Size(350, 45);
-        distance.Location = new Point(mouseDirection.Right + objMargin, mouseSpeed.Top);
-        distance.Text = "Distance between players";
-        distance.TextAlign = ContentAlignment.MiddleCenter;
-        distance.Font = new Font("Georgia", 18, FontStyle.Bold);
-        distance.BackColor = ColorTranslator.FromHtml("#CF8969");
-        Controls.Add(distance);
-
-        enterDistance.Size = new Size(200, 45);
-        enterDistance.Location = new Point(distance.Left + distance.Width / 2 - enterDistance.Width / 2, mouseSpeed.Bottom + tinyMargin);
-        enterDistance.Text = $"{distanceFormula:F2}";;
-        enterDistance.TextAlign = HorizontalAlignment.Center;
-        enterDistance.Font = new Font("Georgia", 18, FontStyle.Regular);
-        enterDistance.ReadOnly = true;
-        enterDistance.BackColor = Color.White;
-        Controls.Add(enterDistance);
-
         blueDirection.Size = new Size(390, 45);
-        blueDirection.Location = new Point(mouseDirection.Left + mouseDirection.Width / 2 - blueDirection.Width / 2, catCoords.Top);
+        blueDirection.Location = new Point(mouseDirection.Right + objMargin, mouseSpeed.Top);
         blueDirection.Text = "Enter Direction Blue (degrees)";
         blueDirection.TextAlign = ContentAlignment.MiddleCenter;
         blueDirection.Font = new Font("Georgia", 18, FontStyle.Bold);
@@ -294,12 +277,30 @@ public class CollisionDetection : Form {
         Controls.Add(blueDirection);
 
         enterBlueDirection.Size = new Size(200, 45);
-        enterBlueDirection.Location = new Point(enterMouseDirection.Left, enterMouseCoords.Top);
+        enterBlueDirection.Location = new Point(blueDirection.Left + blueDirection.Width / 2 - enterBlueDirection.Width / 2, mouseSpeed.Bottom + tinyMargin);
         enterBlueDirection.Text = "";
         enterBlueDirection.TextAlign = HorizontalAlignment.Center;
         enterBlueDirection.Font = new Font("Georgia", 18, FontStyle.Regular);
         enterBlueDirection.BackColor = Color.White;
         Controls.Add(enterBlueDirection);
+
+
+        enterDistance.Size = new Size(200, 45);
+        enterDistance.Location = new Point(enterMouseDirection.Left, enterMouseCoords.Top);
+        enterDistance.Text = $"{distanceFormula:F2}";;
+        enterDistance.TextAlign = HorizontalAlignment.Center;
+        enterDistance.Font = new Font("Georgia", 18, FontStyle.Regular);
+        enterDistance.ReadOnly = true;
+        enterDistance.BackColor = Color.White;
+        Controls.Add(enterDistance);
+
+        distance.Size = new Size(350, 45);
+        distance.Location = new Point(enterDistance.Left + enterDistance.Width / 2 - distance.Width / 2, mouseCoords.Top);
+        distance.Text = "Distance between players";
+        distance.TextAlign = ContentAlignment.MiddleCenter;
+        distance.Font = new Font("Georgia", 18, FontStyle.Bold);
+        distance.BackColor = ColorTranslator.FromHtml("#CF8969");
+        Controls.Add(distance);
         // ദി(ᴗ _ᴗ ദി)
 
 
