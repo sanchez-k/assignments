@@ -9,6 +9,8 @@
     Languages: C# & Bash
     Purpose: To animate two balls that ricochet independently. The speed & direction of the balls is determined
     by the user's input and the program stops when the balls collide against each other.
+    Note: I included the addon feature, so the game doesn't end after the two balls collide, the user is able to
+    press the Reset button to be able to run the program again without needing to reopen the program.
 */
 
 using System;
@@ -122,6 +124,10 @@ public class CollisionDetection : Form {
     private static double distanceFormula = Math.Sqrt(Math.Pow(catCenterCurrCoordsX - mouseCenterCurrCoordsX, 2) + Math.Pow(catCenterCurrCoordsY - mouseCenterCurrCoordsY, 2));
     private static int check = 0;
     private bool showBall = false;
+    private static double distanceX = 0;
+    private static double distanceY = 0;
+    private static double distanceSquared = 0;
+    private static double collisionDistance = 0;
 
     private static System.Windows.Forms.Timer textClock = new System.Windows.Forms.Timer();
 
@@ -483,6 +489,34 @@ public class CollisionDetection : Form {
     }
 
     protected void updateBallCoords(System.Object sender, ElapsedEventArgs events) {
+        // if the balls collide
+        distanceX = mouseCenterCurrCoordsX - catCenterCurrCoordsX;
+        distanceY = mouseCenterCurrCoordsY - catCenterCurrCoordsY;
+        distanceSquared = distanceX * distanceX + distanceY * distanceY;
+        collisionDistance = mouseRadius + catRadius;
+
+        if (distanceSquared <= collisionDistance * collisionDistance) {
+            start.PerformClick();
+            start.Enabled = false;
+            start.Text = "Start";
+            enterDistance.Text = "0";
+            enterMouseSpeed.Enabled = false;
+            enterCatSpeed.Enabled = false;
+            enterMouseCoords.Enabled = false;
+            enterCatCoords.Enabled = false;
+            enterMouseDirection.Enabled = false;
+            enterBlueDirection.Enabled = false;
+            enterDistance.Enabled = false;
+            initial.Enabled = false;
+
+            // i want to customize it but im not writing another file of code for that
+            // begininvoke runs after the current thread (UI) finishes with its task
+            // and action is a delegate (pointer to a method) that doesn’t return anything
+            // it represents a block of code you can run later
+            BeginInvoke(new Action(() => {MessageBox.Show("Collision Detected!");}));
+            return;
+        }
+
         mouseCenterCurrCoordsX += mouseDeltaX;
         mouseCenterCurrCoordsY -= mouseDeltaY;
         catCenterCurrCoordsX += catDeltaX;
@@ -514,49 +548,22 @@ public class CollisionDetection : Form {
         }
 
         // Blue ball
-        if ((int)System.Math.Round(catCenterCurrCoordsX + mouseRadius) >= this.ClientSize.Width) {
+        if ((int)System.Math.Round(catCenterCurrCoordsX + catRadius) >= this.ClientSize.Width) {
             catDeltaX = -catDeltaX;
         }
 
-        if ((int)System.Math.Round(catCenterCurrCoordsX - mouseRadius) <= 0) {
+        if ((int)System.Math.Round(catCenterCurrCoordsX - catRadius) <= 0) {
             catDeltaX = -catDeltaX;
         }
         
-        if ((int)System.Math.Round(catCenterCurrCoordsY - mouseRadius) <= 0) {
+        if ((int)System.Math.Round(catCenterCurrCoordsY - catRadius) <= 0) {
             catDeltaY = -catDeltaY;
         }
 
-        if ((int)System.Math.Round(catCenterCurrCoordsY + mouseRadius) >= ballHeight) {
+        if ((int)System.Math.Round(catCenterCurrCoordsY + catRadius) >= ballHeight) {
             catDeltaY = -catDeltaY;
         }
         // a function wouldve been nice
-
-        // if the balls collide
-        double distanceX = mouseCenterCurrCoordsX - catCenterCurrCoordsX;
-        double distanceY = mouseCenterCurrCoordsY - catCenterCurrCoordsY;
-
-        double distanceSquared = distanceX * distanceX + distanceY * distanceY;
-        double collisionDistance = mouseRadius + catRadius;
-        if (distanceSquared <= collisionDistance * collisionDistance) {
-            start.PerformClick();
-            start.Enabled = false;
-            start.Text = "Start";
-            enterDistance.Text = "0";
-            enterMouseSpeed.Enabled = false;
-            enterCatSpeed.Enabled = false;
-            enterMouseCoords.Enabled = false;
-            enterCatCoords.Enabled = false;
-            enterMouseDirection.Enabled = false;
-            enterBlueDirection.Enabled = false;
-            enterDistance.Enabled = false;
-            initial.Enabled = false;
-
-            // i want to customize it but im not writing another file of code for that
-            // begininvoke runs after the current thread (UI) finishes with its task
-            // and action is a delegate (pointer to a method) that doesn’t return anything
-            // it represents a block of code you can run later
-            BeginInvoke(new Action(() => {MessageBox.Show("Collision Detected!");}));
-        }
     }
 
     protected void refreshUI(System.Object sender, ElapsedEventArgs even) {
@@ -612,5 +619,3 @@ public class CollisionDetection : Form {
         }
     }
 }
-
-// when it collides, put a message saying it collided or something

@@ -8,6 +8,8 @@
 # Languages: C# & Bash
 # Purpose: To animate two balls that ricochet independently. The speed & direction of the balls is determined
 # by the user's input and the program stops when the balls collide against each other.
+# Note: I included the addon feature, so the game doesn't end after the two balls collide, the user is able to
+# press the Reset button to be able to run the program again without needing to reopen the program.
 
 #!/bin/bash
 
