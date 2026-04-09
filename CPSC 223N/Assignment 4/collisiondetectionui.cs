@@ -169,7 +169,7 @@ public class CollisionDetection : Form {
         Controls.Add(reset);
 
         initial.Size = new Size(200, 45);
-        initial.Location = new Point(start.Left, start.Bottom + 15);
+        initial.Location = new Point(start.Left, (start.Bottom + reset.Top) / 2 - initial.Height / 2);
         initial.Text = "Initialize";
         initial.TextAlign = ContentAlignment.MiddleCenter;
         initial.Font = new Font("Georgia", 18, FontStyle.Bold);
