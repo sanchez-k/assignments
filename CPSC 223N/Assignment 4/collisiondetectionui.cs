@@ -173,7 +173,6 @@ public class CollisionDetection : Form {
         initial.Text = "Initialize";
         initial.TextAlign = ContentAlignment.MiddleCenter;
         initial.Font = new Font("Georgia", 18, FontStyle.Bold);
-        // ACC3FD
         initial.BackColor = ColorTranslator.FromHtml("#84A9C2");
         initial.Enabled = false;
         initial.Click += new EventHandler(initClick);
@@ -550,7 +549,13 @@ public class CollisionDetection : Form {
             enterMouseDirection.Enabled = false;
             enterBlueDirection.Enabled = false;
             enterDistance.Enabled = false;
-            System.Windows.Forms.MessageBox.Show("My message here");
+            initial.Enabled = false;
+
+            // i want to customize it but im not writing another file of code for that
+            // begininvoke runs after the current thread (UI) finishes with its task
+            // and action is a delegate (pointer to a method) that doesn’t return anything
+            // it represents a block of code you can run later
+            BeginInvoke(new Action(() => {MessageBox.Show("Collision Detected!");}));
         }
     }
 
@@ -608,6 +613,4 @@ public class CollisionDetection : Form {
     }
 }
 
-// he wants aother clock for the second ball
-    // i dont want to do that, i already got a second clock for the text
 // when it collides, put a message saying it collided or something
