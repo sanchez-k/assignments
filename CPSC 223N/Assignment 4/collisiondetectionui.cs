@@ -50,6 +50,7 @@ public class CollisionDetection : Form {
     private Button start = new Button();
     private Button quit = new Button();
     private Button reset = new Button();
+    private Button initial = new Button();
 
     private Panel titlePanel = new Panel();
     private Panel buttonPanel = new Panel();
@@ -104,10 +105,6 @@ public class CollisionDetection : Form {
     // So it updates 60.5 times per second which is around 0.0165 seconds, itll add the deltas
     private const double ballClockRate = 57.3;
 
-    // might need another clock for cat
-    private static System.Timers.Timer catClock = new System.Timers.Timer();
-    private const double catClockRate = 57.3;
-
     // Another timer object
     private static System.Timers.Timer uiRefreshClock = new System.Timers.Timer();
     // This updates how often the ball gets redrawn
@@ -123,6 +120,8 @@ public class CollisionDetection : Form {
     private static double userBlueDirection = 0;
     // all one line
     private static double distanceFormula = Math.Sqrt(Math.Pow(catCenterCurrCoordsX - mouseCenterCurrCoordsX, 2) + Math.Pow(catCenterCurrCoordsY - mouseCenterCurrCoordsY, 2));
+    private static int check = 0;
+    private bool showBall = false;
 
     private static System.Windows.Forms.Timer textClock = new System.Windows.Forms.Timer();
 
@@ -168,6 +167,17 @@ public class CollisionDetection : Form {
         reset.Enabled = true;
         reset.Click += new EventHandler(resetClick);
         Controls.Add(reset);
+
+        initial.Size = new Size(200, 45);
+        initial.Location = new Point(start.Left, start.Bottom + 15);
+        initial.Text = "Initialize";
+        initial.TextAlign = ContentAlignment.MiddleCenter;
+        initial.Font = new Font("Georgia", 18, FontStyle.Bold);
+        // ACC3FD
+        initial.BackColor = ColorTranslator.FromHtml("#84A9C2");
+        initial.Enabled = false;
+        initial.Click += new EventHandler(initClick);
+        Controls.Add(initial);
         // ✧ദ്ദി( ˶^ᗜ^˶ )
 
 
@@ -217,7 +227,7 @@ public class CollisionDetection : Form {
 
         enterCatCoords.Size = new Size(200, 45);
         enterCatCoords.Location = new Point(enterCatSpeed.Left, quit.Top + 5);
-        enterCatCoords.Text = $"({catCenterInitialCoordsX}, {catCenterInitialCoordsY})";
+        enterCatCoords.Text = "";
         enterCatCoords.TextAlign = HorizontalAlignment.Center;
         enterCatCoords.Font = new Font("Georgia", 18, FontStyle.Regular);
         enterCatCoords.ReadOnly = true;
@@ -226,7 +236,7 @@ public class CollisionDetection : Form {
 
         enterMouseCoords.Size = new Size(200, 45);
         enterMouseCoords.Location = new Point(enterMouseSpeed.Left, enterCatCoords.Top);
-        enterMouseCoords.Text = $"({mouseCenterInitialCoordsX}, {mouseCenterInitialCoordsY})";
+        enterMouseCoords.Text = "";
         enterMouseCoords.TextAlign = HorizontalAlignment.Center;
         enterMouseCoords.Font = new Font("Georgia", 18, FontStyle.Regular);
         enterMouseCoords.ReadOnly = true;
@@ -289,7 +299,7 @@ public class CollisionDetection : Form {
 
         enterDistance.Size = new Size(200, 45);
         enterDistance.Location = new Point(enterMouseDirection.Left, enterMouseCoords.Top);
-        enterDistance.Text = $"{distanceFormula:F2}";;
+        enterDistance.Text = "";
         enterDistance.TextAlign = HorizontalAlignment.Center;
         enterDistance.Font = new Font("Georgia", 18, FontStyle.Regular);
         enterDistance.ReadOnly = true;
@@ -341,13 +351,8 @@ public class CollisionDetection : Form {
         //Prepare the ball clock.  A button will start this clock ticking.
         ballClock.Enabled = false;
         // you need the 1000 to make it around 17.09 ms which is almost 60 fps
-        ballClock.Interval = (int)System.Math.Round(1000.0 / catClockRate);
+        ballClock.Interval = (int)System.Math.Round(1000.0 / ballClockRate);
         ballClock.Elapsed += new ElapsedEventHandler(updateBallCoords);
-
-        catClock.Enabled = false;
-        // you need the 1000 to make it around 17.09 ms which is almost 60 fps
-        catClock.Interval = (int)System.Math.Round(1000.0 / catClockRate);
-        catClock.Elapsed += new ElapsedEventHandler(updateBallCoords);
 
         // this hooks up any text changes to the function textFilled, kinda like a button
         // but you write stuff in it instead
@@ -362,7 +367,6 @@ public class CollisionDetection : Form {
             start.Text = "Pause";
             uiRefreshClock.Enabled = true;
             ballClock.Enabled = true;
-            catClock.Enabled = true;
             textClock.Start();
 
             // Ensuring that these can't be messed with while the ball is moving
@@ -374,11 +378,11 @@ public class CollisionDetection : Form {
             enterBlueDirection.Enabled = false;
             enterDistance.Enabled = false;
             reset.Enabled = false;
+            initial.Enabled = false;
 
         } else {
             uiRefreshClock.Enabled = false;
             ballClock.Enabled = false;
-            catClock.Enabled = false;
             textClock.Stop();
             start.Text = "Resume";
 
@@ -396,8 +400,8 @@ public class CollisionDetection : Form {
     }
 
     protected void resetClick(Object sender, EventArgs events) {
-        enterMouseCoords.Text = $"({mouseCenterInitialCoordsX}, {mouseCenterInitialCoordsY})";
-        enterCatCoords.Text = $"({catCenterInitialCoordsX}, {catCenterInitialCoordsY})";
+        enterMouseCoords.Text = "";
+        enterCatCoords.Text = "";
         enterMouseSpeed.Text = "";
         enterCatSpeed.Text = "";
         enterMouseDirection.Text = "";
@@ -406,8 +410,9 @@ public class CollisionDetection : Form {
         mouseCenterCurrCoordsY = mouseCenterInitialCoordsY;
         catCenterCurrCoordsX = catCenterInitialCoordsX;
         catCenterCurrCoordsY = catCenterInitialCoordsY;
-        distanceFormula = Math.Sqrt(Math.Pow(catCenterCurrCoordsX - mouseCenterCurrCoordsX, 2) + Math.Pow(catCenterCurrCoordsY - mouseCenterCurrCoordsY, 2));
-        enterDistance.Text = $"{distanceFormula:F2}";
+        
+        enterDistance.Text = "";
+        
         start.Text = "Start";
         enterMouseSpeed.Enabled = true;
         enterCatSpeed.Enabled = true;
@@ -416,19 +421,37 @@ public class CollisionDetection : Form {
         enterMouseDirection.Enabled = true;
         enterBlueDirection.Enabled = true;
         enterDistance.Enabled = true;
-        reset.Enabled = true;
         ballPanel.Invalidate();
     }
 
-    private void textFilled(object sender, EventArgs events) {
-        enterMouseCoords.Text = $"({mouseCenterInitialCoordsX}, {mouseCenterInitialCoordsY})";
-        enterCatCoords.Text = $"({catCenterInitialCoordsX}, {catCenterInitialCoordsY})";
+    protected void initClick(Object sender, EventArgs events) {
+        // the ball and coords get displayed AFTER the user clicks on the button
         mouseCenterCurrCoordsX = mouseCenterInitialCoordsX;
         mouseCenterCurrCoordsY = mouseCenterInitialCoordsY;
         catCenterCurrCoordsX = catCenterInitialCoordsX;
         catCenterCurrCoordsY = catCenterInitialCoordsY;
+
+        enterMouseCoords.Text = $"({mouseCenterInitialCoordsX}, {mouseCenterInitialCoordsY})";
+        enterCatCoords.Text = $"({catCenterInitialCoordsX}, {catCenterInitialCoordsY})";
         distanceFormula = Math.Sqrt(Math.Pow(catCenterCurrCoordsX - mouseCenterCurrCoordsX, 2) + Math.Pow(catCenterCurrCoordsY - mouseCenterCurrCoordsY, 2));
         enterDistance.Text = $"{distanceFormula:F2}";
+        showBall = true;
+        ballPanel.displayBall(showBall);
+
+        start.Enabled = true;
+    }
+
+    private void textFilled(object sender, EventArgs events) {
+        showBall = false;
+        ballPanel.displayBall(showBall);
+
+        enterMouseCoords.Text = "";
+        enterCatCoords.Text = "";
+        mouseCenterCurrCoordsX = mouseCenterInitialCoordsX;
+        mouseCenterCurrCoordsY = mouseCenterInitialCoordsY;
+        catCenterCurrCoordsX = catCenterInitialCoordsX;
+        catCenterCurrCoordsY = catCenterInitialCoordsY;
+        enterDistance.Text = "";
         start.Text = "Start";
 
         if (Double.TryParse(enterMouseSpeed.Text, out userMouseSpeed) == false ||
@@ -437,17 +460,22 @@ public class CollisionDetection : Form {
             Double.TryParse(enterBlueDirection.Text, out userBlueDirection) == false ||
             userMouseSpeed < 0 || userCatSpeed < 0) {
             start.Enabled = false;
+            initial.Enabled = false;
             return;
         } else {
-            start.Enabled = true;
+            if (check >= 1) {
+                start.Enabled = false;
+            }
+            initial.Enabled = true;
 
             pixelPerTic = userMouseSpeed/ballClockRate;
-            catPixelPerTic = userCatSpeed/catClockRate;
+            catPixelPerTic = userCatSpeed/ballClockRate;
 
             mouseDeltaX = pixelPerTic * Math.Cos(userMouseDirection * Math.PI/180.0);
             mouseDeltaY = pixelPerTic * Math.Sin(userMouseDirection * Math.PI/180.0);
             catDeltaX = catPixelPerTic * Math.Cos(userBlueDirection * Math.PI/180.0);
             catDeltaY = catPixelPerTic * Math.Sin(userBlueDirection * Math.PI/180.0);
+            check++;
         }
     }
 
@@ -459,7 +487,7 @@ public class CollisionDetection : Form {
         mouseCenterCurrCoordsX += mouseDeltaX;
         mouseCenterCurrCoordsY -= mouseDeltaY;
         catCenterCurrCoordsX += catDeltaX;
-        catCenterCurrCoordsY += catDeltaY;
+        catCenterCurrCoordsY -= catDeltaY;
 
         // Red ball
         // ricochet if it hits the right wall
@@ -520,7 +548,9 @@ public class CollisionDetection : Form {
             enterMouseCoords.Enabled = false;
             enterCatCoords.Enabled = false;
             enterMouseDirection.Enabled = false;
+            enterBlueDirection.Enabled = false;
             enterDistance.Enabled = false;
+            System.Windows.Forms.MessageBox.Show("My message here");
         }
     }
 
@@ -538,32 +568,40 @@ public class CollisionDetection : Form {
     public class GraphicPanel : Panel {
         private SolidBrush redBrush;
         private SolidBrush blueBrush;
+        private bool ballShown = false;
 
         public GraphicPanel() {
             redBrush = new SolidBrush(Color.Red);
             blueBrush = new SolidBrush(Color.Blue);
         }
 
+        public void displayBall(bool ans) {
+            ballShown = ans;
+            this.Invalidate();
+        }
+
         protected override void OnPaint(PaintEventArgs artsy) {
             Graphics graph = artsy.Graphics;
 
-            // Drawing the red ball  
-            mouseUpperLeftCurrCoordsX = mouseCenterCurrCoordsX - mouseRadius;
-            mouseUpperLeftCurrCoordsY = mouseCenterCurrCoordsY - mouseRadius;
-            graph.FillEllipse(redBrush,
-                            (int)mouseUpperLeftCurrCoordsX,
-                            (int)mouseUpperLeftCurrCoordsY,
-                            (float)(2.0 * mouseRadius),
-                            (float)(2.0 * mouseRadius));
+            if (ballShown == true) {
+                // Drawing the red ball  
+                mouseUpperLeftCurrCoordsX = mouseCenterCurrCoordsX - mouseRadius;
+                mouseUpperLeftCurrCoordsY = mouseCenterCurrCoordsY - mouseRadius;
+                graph.FillEllipse(redBrush,
+                                (int)mouseUpperLeftCurrCoordsX,
+                                (int)mouseUpperLeftCurrCoordsY,
+                                (float)(2.0 * mouseRadius),
+                                (float)(2.0 * mouseRadius));
 
-            // drawing the blue ball
-            catUpperLeftCurrCoordsX = catCenterCurrCoordsX - catRadius;
-            catUpperLeftCurrCoordsY = catCenterCurrCoordsY - catRadius;
-            graph.FillEllipse(blueBrush,
-                            (int)catUpperLeftCurrCoordsX,
-                            (int)catUpperLeftCurrCoordsY,
-                            (float)(2.0 * catRadius),
-                            (float)(2.0 * catRadius));
+                // drawing the blue ball
+                catUpperLeftCurrCoordsX = catCenterCurrCoordsX - catRadius;
+                catUpperLeftCurrCoordsY = catCenterCurrCoordsY - catRadius;
+                graph.FillEllipse(blueBrush,
+                                (int)catUpperLeftCurrCoordsX,
+                                (int)catUpperLeftCurrCoordsY,
+                                (float)(2.0 * catRadius),
+                                (float)(2.0 * catRadius));
+            }
 
             base.OnPaint(artsy);
         }
@@ -571,6 +609,5 @@ public class CollisionDetection : Form {
 }
 
 // he wants aother clock for the second ball
-    // might need to make a second updateballcoords because of the new clock
-// put initialize again
+    // i dont want to do that, i already got a second clock for the text
 // when it collides, put a message saying it collided or something
