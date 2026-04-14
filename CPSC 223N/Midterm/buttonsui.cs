@@ -152,49 +152,13 @@ public class RicochetBall : Form {
         CancelButton = quit;
         // ✧ദ്ദി( ˶^ᗜ^˶ )
 
-        plus.Size = new Size(200, 45);
-        plus.Location = new Point(start.Right + objMargin, start.Top - objMargin - 20);
-        plus.Text = "+10";
-        plus.TextAlign = ContentAlignment.MiddleCenter;
-        plus.Font = new Font("Georgia", 20, FontStyle.Bold);
-        plus.BackColor = Color.Green;
-        plus.Enabled = false;
-        plus.Click += new EventHandler(plusClick);
-        Controls.Add(plus);
-
-        minus.Size = new Size(200, 45);
-        minus.Location = new Point(plus.Right + objMargin, start.Top - objMargin - 20);
-        minus.Text = "-10";
-        minus.TextAlign = ContentAlignment.MiddleCenter;
-        minus.Font = new Font("Georgia", 20, FontStyle.Bold);
-        minus.BackColor = Color.Red;
-        minus.Enabled = false;
-        minus.Click += new EventHandler(minusClick);
-        Controls.Add(minus);
-
-        currSpeed.Size = new Size(260, 45);
-        currSpeed.Location = new Point(start.Right + objMargin, start.Top);
-        currSpeed.Text = "Current speed (p/s)";
-        currSpeed.TextAlign = ContentAlignment.MiddleCenter;
-        currSpeed.Font = new Font("Georgia", 20, FontStyle.Bold);
-        currSpeed.BackColor = ColorTranslator.FromHtml("#CF8969");
-        Controls.Add(currSpeed);
-
-        enterCurrSpeed.Size = new Size(200, 45);
-        enterCurrSpeed.Location = new Point(currSpeed.Right + tinyMargin, start.Top);
-        enterCurrSpeed.Text = "";
-        enterCurrSpeed.Font = new Font("Georgia", 20, FontStyle.Regular);
-        enterCurrSpeed.ReadOnly = true;
-        enterCurrSpeed.BackColor = Color.White;
-        Controls.Add(enterCurrSpeed);
-
 
         // hardcoding the size man, smh
         title.Size = new Size(610, 50);
         title.Location = new Point((formWidth - title.Width) / 2, (titleHeight / 2) - (title.Height / 2));
         title.Text = "Midterm Test Ball by Kassandra Sanchez";
         title.TextAlign = ContentAlignment.MiddleCenter;
-        title.Font = new Font("Georgia", 25, FontStyle.Regular);
+        title.Font = new Font("Georgia", 25, FontStyle.Bold);
         title.BackColor = ColorTranslator.FromHtml("#C3B1E1");
         Controls.Add(title);
         // ദ്ദി ˉ͈̀꒳ˉ͈́ )✧
@@ -277,6 +241,56 @@ public class RicochetBall : Form {
         coords.Font = new Font("Georgia", 20, FontStyle.Bold);
         coords.BackColor = ColorTranslator.FromHtml("#CF8969");
         Controls.Add(coords);
+
+
+        enterCurrSpeed.Size = new Size(200, 45);
+        enterCurrSpeed.Location = new Point(coords.Left - enterCurrSpeed.Width - objMargin, coords.Top);
+        enterCurrSpeed.Text = "";
+        enterCurrSpeed.Font = new Font("Georgia", 20, FontStyle.Regular);
+        enterCurrSpeed.ReadOnly = true;
+        enterCurrSpeed.BackColor = Color.White;
+        Controls.Add(enterCurrSpeed);
+
+        currSpeed.Size = new Size(260, 45);
+        currSpeed.Location = new Point(enterCurrSpeed.Left - currSpeed.Width - tinyMargin, coords.Top);
+        currSpeed.Text = "Current speed (p/s)";
+        currSpeed.TextAlign = ContentAlignment.MiddleCenter;
+        currSpeed.Font = new Font("Georgia", 20, FontStyle.Bold);
+        currSpeed.BackColor = ColorTranslator.FromHtml("#CF8969");
+        Controls.Add(currSpeed);
+
+        // StartEdge + (EndEdge - StartEdge - ObjectSize) / 2
+        minus.Size = new Size(80, 45);
+        //minus.Location = new Point(currSpeed.Right + (enterCurrSpeed.Left - currSpeed.Right - minus.Width) / 2, quit.Top);
+        minus.Text = "-10";
+        minus.TextAlign = ContentAlignment.MiddleCenter;
+        minus.Font = new Font("Georgia", 20, FontStyle.Bold);
+        minus.BackColor = ColorTranslator.FromHtml("#BA5F6F");
+        minus.Enabled = false;
+        minus.Click += new EventHandler(minusClick);
+        Controls.Add(minus);
+
+
+        plus.Location = new Point(currSpeed.Right + (enterCurrSpeed.Left - currSpeed.Right - (plus.Width + tinyMargin + minus.Width)) / 2, quit.Top);
+minus.Location = new Point(plus.Right + objMargin, quit.Top);
+
+        plus.Size = new Size(80, 45);
+        //plus.Location = new Point(minus.Left - plus.Width - tinyMargin, quit.Top);
+        plus.Text = "+10";
+        plus.TextAlign = ContentAlignment.MiddleCenter;
+        plus.Font = new Font("Georgia", 20, FontStyle.Bold);
+        // bright but kinda the same color as start #60BC71
+        // not bright #519F5F
+        plus.BackColor = ColorTranslator.FromHtml("#519F5F");
+        plus.Enabled = false;
+        plus.Click += new EventHandler(plusClick);
+        Controls.Add(plus);
+
+        
+
+        
+
+
         // ദി(ᴗ _ᴗ ദി)
 
 
