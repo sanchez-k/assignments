@@ -513,7 +513,7 @@ public class CollisionDetection : Form {
             // begininvoke runs after the current thread (UI) finishes with its task
             // and action is a delegate (pointer to a method) that doesn’t return anything
             // it represents a block of code you can run later
-            BeginInvoke(new Action(() => {MessageBox.Show("Collision Detected!");}));
+            BeginInvoke(new Action(() => {MessageBox.Show("Collision Detected!", "Game Paused", MessageBoxButtons.OK, MessageBoxIcon.Information);}));
             return;
         }
 
