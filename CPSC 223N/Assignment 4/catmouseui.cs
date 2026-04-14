@@ -45,6 +45,7 @@ public class CatMouse : Form {
 
     private Button start = new Button();
     private Button quit = new Button();
+    private Button reset = new Button();
 
     private Panel titlePanel = new Panel();
     private Panel buttonPanel = new Panel();
@@ -154,6 +155,17 @@ public class CatMouse : Form {
         quit.Click += new EventHandler(quitClick);
         Controls.Add(quit);
         CancelButton = quit;
+
+        reset.Size = new Size(200, 45);
+        reset.Location = new Point(start.Left, quit.Top);
+        reset.Text = "Reset";
+        reset.TextAlign = ContentAlignment.MiddleCenter;
+        reset.Font = new Font("Georgia", 20, FontStyle.Bold);
+        reset.BackColor = ColorTranslator.FromHtml("#CF697B");
+        reset.Enabled = true;
+        reset.Click += new EventHandler(resetClick);
+        Controls.Add(reset);
+        CancelButton = reset;
         // ✧ദ്ദി( ˶^ᗜ^˶ )
 
 
@@ -324,6 +336,16 @@ public class CatMouse : Form {
             enterCatCoords.Enabled = false;
             enterMouseDirection.Enabled = false;
             enterDistance.Enabled = false;
+            reset.Enabled = false;
+
+            pixelPerTic = userMouseSpeed/ballClockRate;
+            catPixelPerTic = userCatSpeed/ballClockRate;
+            if (mouseCenterCurrCoordsX == mouseCenterInitialCoordsX &&
+                mouseCenterCurrCoordsY == mouseCenterInitialCoordsY &&
+                catCenterCurrCoordsX == catCenterInitialCoordsX &&
+                catCenterCurrCoordsY == catCenterInitialCoordsY) {
+                randoNum(pixelPerTic, catPixelPerTic);
+            }
 
         } else {
             uiRefreshClock.Enabled = false;
@@ -337,8 +359,31 @@ public class CatMouse : Form {
             enterCatCoords.Enabled = true;
             enterMouseDirection.Enabled = true;
             enterDistance.Enabled = true;
+            reset.Enabled = true;
         }
         bothClocksStopped = !bothClocksStopped;
+    }
+
+    protected void resetClick(Object sender, EventArgs events) {
+        enterMouseCoords.Text = $"({mouseCenterInitialCoordsX}, {mouseCenterInitialCoordsY})";
+        enterCatCoords.Text = $"({catCenterInitialCoordsX}, {catCenterInitialCoordsY})";
+        enterMouseSpeed.Text = "";
+        enterCatSpeed.Text = "";
+        mouseCenterCurrCoordsX = mouseCenterInitialCoordsX;
+        mouseCenterCurrCoordsY = mouseCenterInitialCoordsY;
+        catCenterCurrCoordsX = catCenterInitialCoordsX;
+        catCenterCurrCoordsY = catCenterInitialCoordsY;
+        distanceFormula = Math.Sqrt(Math.Pow(catCenterCurrCoordsX - mouseCenterCurrCoordsX, 2) + Math.Pow(catCenterCurrCoordsY - mouseCenterCurrCoordsY, 2));
+        enterDistance.Text = $"{distanceFormula:F2}";
+        start.Text = "Start";
+        enterMouseSpeed.Enabled = true;
+        enterCatSpeed.Enabled = true;
+        enterMouseCoords.Enabled = true;
+        enterCatCoords.Enabled = true;
+        enterMouseDirection.Enabled = true;
+        enterDistance.Enabled = true;
+        reset.Enabled = true;
+        ballPanel.Invalidate();
     }
 
     private void textFilled(object sender, EventArgs events) {
@@ -351,9 +396,6 @@ public class CatMouse : Form {
         distanceFormula = Math.Sqrt(Math.Pow(catCenterCurrCoordsX - mouseCenterCurrCoordsX, 2) + Math.Pow(catCenterCurrCoordsY - mouseCenterCurrCoordsY, 2));
         enterDistance.Text = $"{distanceFormula:F2}";
         start.Text = "Start";
-        num = 0;
-        ricochetWall = 0;
-        ballPanel.ballCollision(num);
 
         if (Double.TryParse(enterMouseSpeed.Text, out userMouseSpeed) == false ||
             Double.TryParse(enterCatSpeed.Text, out userCatSpeed) == false ||
@@ -377,25 +419,6 @@ public class CatMouse : Form {
     }
 
     protected void updateBallCoords(System.Object sender, ElapsedEventArgs events) {
-        //if (prevRicochetWall < ricochetWall) {
-            // change cat direction
-            catDeltaX = mouseCenterCurrCoordsX - catCenterCurrCoordsX * catPixelPerTic;
-            catDeltaY = mouseCenterCurrCoordsY - catCenterCurrCoordsY * catPixelPerTic;
-            
-            // need to find the length, to help determine the speed
-            lengthBetween = Math.Sqrt(catDeltaX * catDeltaX + catDeltaY * catDeltaY);
-
-            if (lengthBetween != 0) {
-                catDeltaX /= lengthBetween;
-                catDeltaY /= lengthBetween;
-            }
-
-            //catCenterCurrCoordsX += catDeltaX * userCatSpeed;
-            //catCenterCurrCoordsY += catDeltaX * userCatSpeed;
-        //}
-        
-
-
         mouseCenterCurrCoordsX += mouseDeltaX;
         mouseCenterCurrCoordsY -= mouseDeltaY;
         catCenterCurrCoordsX += catDeltaX;
@@ -403,7 +426,7 @@ public class CatMouse : Form {
         enterMouseCoords.Text = $"({mouseCenterCurrCoordsX:F0}, {mouseCenterCurrCoordsY:F0})";
         enterCatCoords.Text = $"({catCenterCurrCoordsX:F0}, {catCenterCurrCoordsY:F0})";
 
-        distanceFormula = Math.Sqrt(Math.Pow(catCenterCurrCoordsX - mouseCenterCurrCoordsX, 2) + Math.Pow(catCenterCurrCoordsY - mouseCenterCurrCoordsY, 2));
+        //distanceFormula = Math.Sqrt(Math.Pow(catCenterCurrCoordsX - mouseCenterCurrCoordsX, 2) + Math.Pow(catCenterCurrCoordsY - mouseCenterCurrCoordsY, 2));
         enterDistance.Text = $"{distanceFormula:F2}";
 
         // Red ball
@@ -458,15 +481,17 @@ public class CatMouse : Form {
         double distanceY = mouseCenterCurrCoordsY - catCenterCurrCoordsY;
 
         double distanceSquared = distanceX * distanceX + distanceY * distanceY;
-        double collisionDistance = 2 * mouseRadius;
+        double collisionDistance = mouseRadius + catRadius;
         if (distanceSquared <= collisionDistance * collisionDistance) {
-            if (!ballsColliding) {
-                ballsColliding = true;
-                num++;
-                ballPanel.ballCollision(num);
-            }
-        } else {
-            ballsColliding = false;
+            start.PerformClick();
+            start.Enabled = false;
+            start.Text = "Start";
+            enterMouseSpeed.Enabled = false;
+            enterCatSpeed.Enabled = false;
+            enterMouseCoords.Enabled = false;
+            enterCatCoords.Enabled = false;
+            enterMouseDirection.Enabled = false;
+            enterDistance.Enabled = false;
         }
     }
 
@@ -506,20 +531,9 @@ public class CatMouse : Form {
 
             base.OnPaint(artsy);
         }
-
-        public void ballCollision(int hit) {
-            if (hit % 2 != 0) {
-                redBrush.Color = Color.Green;
-                blueBrush.Color = Color.Orange;
-            } else {
-                redBrush.Color = Color.Red;
-                blueBrush.Color = Color.Blue;
-            }
-            this.Invalidate();
-        }
     }
 
-    /*protected void randoNum(double redPix, double bluePix) {
+    protected void randoNum(double redPix, double bluePix) {
         Random rando = new Random();
         double redNum = rando.Next(20, 361);
         double blueNum = rando.Next(20,361);
@@ -528,7 +542,8 @@ public class CatMouse : Form {
         mouseDeltaY = pixelPerTic * Math.Sin(redNum * Math.PI/180.0);
         catDeltaX = catPixelPerTic * Math.Cos(blueNum * Math.PI/180.0);
         catDeltaY = catPixelPerTic * Math.Sin(blueNum * Math.PI/180.0);
-    }*/
+    }
 }
 
-// enter direction
+// update distance
+// remove enter mouse dir
