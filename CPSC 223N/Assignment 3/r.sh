@@ -28,6 +28,6 @@ echo View the list of files in the current folder
 ls -l
 
 echo Run the Assignment 3 program.
-./ricochetball.exe
+mono ./ricochetball.exe
 
 echo The script has terminated.
