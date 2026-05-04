@@ -4,7 +4,7 @@
     Cwid:  884962788
     Assignment:  5
     Program:  Ellipse
-    Due:  April 27, 2026 @ 11:59pm
+    Due:  May 6, 2026 @ 11:59pm
     Course:  CPSC223N-1
     Languages: C# & Bash
     Purpose: To animate one ball that travels in the shape of an ellipse.
@@ -53,8 +53,8 @@ public class EllipseProgram : Form {
     private const double radius = 12.65;
 
     // where the ball starts each time
-    private static double centerInitCoordsX = formWidth - formWidth / 4;
-    private static double centerInitCoordsY = ballHeight / 2;
+    private static double centerInitCoordsX = (formWidth/2 + 600);
+    private static double centerInitCoordsY = (ballHeight/2);
 
     // Speed variables
     // How far should the ball move each time the timer tics
@@ -87,9 +87,11 @@ public class EllipseProgram : Form {
     private int tinyMargin = 10;
     private bool bothClocksStopped = true;
     private static double userMouseSpeed = 0.0;
-
-    private bool showBall = false;
-    
+    private double centerEllipseX = formWidth / 2;
+    private double centerEllipseY = ballHeight / 2;
+    private static double coordT = 0; 
+    private static double curve = 0;
+    private static double deltaT = 0;
 
     public EllipseProgram() {
         // Setting up the UI
@@ -102,31 +104,30 @@ public class EllipseProgram : Form {
 
         // Setting up the buttons
         go.Size = new Size(200, 45);
-        go.Location = new Point(20, titleHeight + ballHeight + 15);
-        go.Text = "Start";
+        go.Location = new Point(20, this.ClientSize.Height - go.Height - 15);
+        go.Text = "Go";
         go.TextAlign = ContentAlignment.MiddleCenter;
-        go.Font = new Font("Georgia", 18, FontStyle.Bold);
+        go.Font = new Font("Georgia", 20, FontStyle.Bold);
         go.BackColor = ColorTranslator.FromHtml("#69CF7B");
         go.Enabled = false;
-        go.Click += new EventHandler(startClick);
+        go.Click += new EventHandler(goClick);
         Controls.Add(go);
         AcceptButton = go;
 
         exit.Size = new Size(200, 45);
-        // go.Top uses go's Y value
-        exit.Location = new Point(this.ClientSize.Width - exit.Width - 20, this.ClientSize.Height - exit.Height - 15);
+        exit.Location = new Point(this.ClientSize.Width - exit.Width - 20, go.Top);
         exit.Text = "Quit";
         exit.TextAlign = ContentAlignment.MiddleCenter;
-        exit.Font = new Font("Georgia", 18, FontStyle.Bold);
+        exit.Font = new Font("Georgia", 20, FontStyle.Bold);
         exit.BackColor = ColorTranslator.FromHtml("#CF697B");
         exit.Enabled = true;
-        exit.Click += new EventHandler(quitClick);
+        exit.Click += new EventHandler(exitClick);
         Controls.Add(exit);
         CancelButton = exit;
         // ✧ദ്ദി( ˶^ᗜ^˶ )
 
 
-        title.Size = new Size(710, 50);
+        title.Size = new Size(780, 50);
         title.Location = new Point((formWidth - title.Width) / 2, (titleHeight / 2) - (title.Height / 2));
         title.Text = "Traveling on an Ellipse by Kassandra Sanchez";
         title.TextAlign = ContentAlignment.MiddleCenter;
@@ -137,56 +138,57 @@ public class EllipseProgram : Form {
 
 
         // Now the rest of the labels & textboxes
-        currSpeed.Size = new Size(320, 45);
-        currSpeed.Location = new Point(go.Right + objMargin, go.Top - 5);
-        currSpeed.Text = "Enter Blue Ball Speed (p/s)";
-        currSpeed.TextAlign = ContentAlignment.MiddleCenter;
-        currSpeed.Font = new Font("Georgia", 18, FontStyle.Bold);
-        currSpeed.BackColor = ColorTranslator.FromHtml("#CF8969");
-        Controls.Add(currSpeed);
-
-        initSpeed.Size = new Size(320, 45);
-        initSpeed.Location = new Point(currSpeed.Right + objMargin, currSpeed.Top);
-        initSpeed.Text = "Enter Red Ball Speed (p/s)";
+        initSpeed.Size = new Size(360, 45);
+        initSpeed.Location = new Point(go.Left, titleHeight + ballHeight + 15);
+        initSpeed.Text = "Enter initial curve pix/sec";
         initSpeed.TextAlign = ContentAlignment.MiddleCenter;
-        initSpeed.Font = new Font("Georgia", 18, FontStyle.Bold);
+        initSpeed.Font = new Font("Georgia", 20, FontStyle.Bold);
         initSpeed.BackColor = ColorTranslator.FromHtml("#CF8969");
         Controls.Add(initSpeed);
-
-
-        enterCurrSpeed.Size = new Size(200, 45);
-        enterCurrSpeed.Location = new Point(currSpeed.Left + currSpeed.Width / 2 - enterCurrSpeed.Width / 2, currSpeed.Bottom + tinyMargin);
-        enterCurrSpeed.Text = "";
-        enterCurrSpeed.TextAlign = HorizontalAlignment.Center;
-        enterCurrSpeed.Font = new Font("Georgia", 18, FontStyle.Regular);
-        enterCurrSpeed.BackColor = Color.White;
-        Controls.Add(enterCurrSpeed);
 
         enterInitSpeed.Size = new Size(200, 45);
         enterInitSpeed.Location = new Point(initSpeed.Left + initSpeed.Width / 2 - enterInitSpeed.Width / 2, initSpeed.Bottom + tinyMargin);
         enterInitSpeed.Text = "";
         enterInitSpeed.TextAlign = HorizontalAlignment.Center;
-        enterInitSpeed.Font = new Font("Georgia", 18, FontStyle.Regular);
+        enterInitSpeed.Font = new Font("Georgia", 20, FontStyle.Regular);
         enterInitSpeed.BackColor = Color.White;
         Controls.Add(enterInitSpeed);
 
 
+        coords.Size = new Size(250, 45);
+        coords.Location = new Point(initSpeed.Right + objMargin, initSpeed.Top);
+        coords.Text = "Current location";
+        coords.TextAlign = ContentAlignment.MiddleCenter;
+        coords.Font = new Font("Georgia", 20, FontStyle.Bold);
+        coords.BackColor = ColorTranslator.FromHtml("#CF8969");
+        Controls.Add(coords);
+
         enterCoords.Size = new Size(200, 45);
-        enterCoords.Location = new Point(enterInitSpeed.Left, enterCatCoords.Top);
-        enterCoords.Text = "";
+        enterCoords.Location = new Point(coords.Left + coords.Width / 2 - enterCoords.Width / 2, coords.Bottom + tinyMargin);
+        enterCoords.Text = $"({centerInitCoordsX:F0}, {centerInitCoordsY:F0})";
         enterCoords.TextAlign = HorizontalAlignment.Center;
-        enterCoords.Font = new Font("Georgia", 18, FontStyle.Regular);
+        enterCoords.Font = new Font("Georgia", 20, FontStyle.Regular);
         enterCoords.ReadOnly = true;
         enterCoords.BackColor = Color.White;
         Controls.Add(enterCoords);
 
-        coords.Size = new Size(240, 45);
-        coords.Location = new Point(initSpeed.Left + initSpeed.Width / 2 - coords.Width / 2, catCoords.Top);
-        coords.Text = "Red Ball Location";
-        coords.TextAlign = ContentAlignment.MiddleCenter;
-        coords.Font = new Font("Georgia", 18, FontStyle.Bold);
-        coords.BackColor = ColorTranslator.FromHtml("#CF8969");
-        Controls.Add(coords);
+
+        currSpeed.Size = new Size(310, 45);
+        currSpeed.Location = new Point(coords.Right + objMargin, initSpeed.Top);
+        currSpeed.Text = "Current curve pix/sec";
+        currSpeed.TextAlign = ContentAlignment.MiddleCenter;
+        currSpeed.Font = new Font("Georgia", 20, FontStyle.Bold);
+        currSpeed.BackColor = ColorTranslator.FromHtml("#CF8969");
+        Controls.Add(currSpeed);
+
+        enterCurrSpeed.Size = new Size(200, 45);
+        enterCurrSpeed.Location = new Point(currSpeed.Left + currSpeed.Width / 2 - enterCurrSpeed.Width / 2, currSpeed.Bottom + tinyMargin);
+        enterCurrSpeed.Text = "";
+        enterCurrSpeed.TextAlign = HorizontalAlignment.Center;
+        enterCurrSpeed.Font = new Font("Georgia", 20, FontStyle.Regular);
+        enterCurrSpeed.ReadOnly = true;
+        enterCurrSpeed.BackColor = Color.White;
+        Controls.Add(enterCurrSpeed);
         // ദി(ᴗ _ᴗ ദി)
 
 
@@ -220,15 +222,13 @@ public class EllipseProgram : Form {
 
         // Prepare the ball clock.  A button will go this clock ticking.
         ballClock.Enabled = false;
-        // you need the 1000 to make it around 17.09 ms which is almost 60 fps
         ballClock.Interval = (int)System.Math.Round(1000.0 / ballClockRate);
         ballClock.Elapsed += new ElapsedEventHandler(updateBallCoords);
 
         enterInitSpeed.TextChanged += textFilled;
-        enterCurrSpeed.TextChanged += textFilled;
     }
 
-    protected void startClick(Object sender, EventArgs events) {
+    protected void goClick(Object sender, EventArgs events) {
         if (bothClocksStopped) {
             go.Text = "Pause";
             uiRefreshClock.Enabled = true;
@@ -243,7 +243,7 @@ public class EllipseProgram : Form {
             uiRefreshClock.Enabled = false;
             ballClock.Enabled = false;
             textClock.Stop();
-            go.Text = "Resume";
+            go.Text = "Go";
 
             // re-enabling these back
             enterInitSpeed.Enabled = true;
@@ -254,40 +254,38 @@ public class EllipseProgram : Form {
     }
 
     private void textFilled(object sender, EventArgs events) {
-        showBall = false;
-        ballPanel.displayBall(showBall);
-
-        enterCoords.Text = "";
-        enterCatCoords.Text = "";
+        enterCoords.Text = $"({centerInitCoordsX:F0}, {centerInitCoordsY:F0})";
         centerCurrCoordsX = centerInitCoordsX;
         centerCurrCoordsY = centerInitCoordsY;
-        catCenterCurrCoordsX = catCenterInitialCoordsX;
-        catCenterCurrCoordsY = catCenterInitialCoordsY;
-        enterDistance.Text = "";
-        go.Text = "Start";
+        ballPanel.Invalidate();
+        go.Text = "Go";
 
         if (Double.TryParse(enterInitSpeed.Text, out userMouseSpeed) == false ||
-            Double.TryParse(enterCurrSpeed.Text, out userCatSpeed) == false ||
-            userMouseSpeed < 0) {
+            userMouseSpeed <= 0) {
             go.Enabled = false;
-            initial.Enabled = false;
             return;
         } else {
+            enterCurrSpeed.Text = userMouseSpeed.ToString();
+            go.Enabled = true;
             pixelPerTic = userMouseSpeed/ballClockRate;
-
-            deltaX = pixelPerTic * Math.Cos(userMouseDirection * Math.PI/180.0);
-            deltaY = pixelPerTic * Math.Sin(userMouseDirection * Math.PI/180.0);
-            check++;
+            coordT = 0;
         }
     }
 
-    protected void quitClick(Object sender, EventArgs events) {
+    protected void exitClick(Object sender, EventArgs events) {
         Close();
     }
 
     protected void updateBallCoords(System.Object sender, ElapsedEventArgs events) {
-        centerCurrCoordsX += deltaX;
-        centerCurrCoordsY -= deltaY;
+        deltaX = -600 * Math.Sin(coordT);
+        deltaY =  250 * Math.Cos(coordT);
+
+        curve = Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
+        deltaT = pixelPerTic / curve;
+        coordT -= deltaT;
+
+        centerCurrCoordsX = centerEllipseX + 600 * Math.Cos(coordT);
+        centerCurrCoordsY = centerEllipseY + 250 * Math.Sin(coordT);
     }
 
     protected void refreshUI(System.Object sender, ElapsedEventArgs even) {
@@ -299,31 +297,41 @@ public class EllipseProgram : Form {
     }
 
     public class GraphicPanel : Panel {
+        private Pen ellipseTrack = new Pen(ColorTranslator.FromHtml("#FCFCFC"), 2);
         private SolidBrush redBrush;
-        private bool ballShown = false;
 
         public GraphicPanel() {
-            redBrush = new SolidBrush(Color.Red);
-        }
-
-        public void displayBall(bool ans) {
-            ballShown = ans;
-            this.Invalidate();
+            redBrush = new SolidBrush(ColorTranslator.FromHtml("#10288C"));
+            //899475
         }
 
         protected override void OnPaint(PaintEventArgs artsy) {
             Graphics graph = artsy.Graphics;
 
-            if (ballShown == true) {
-                // Drawing the red ball  
-                upperLeftCurrCoordsX = centerCurrCoordsX - radius;
-                upperLeftCurrCoordsY = centerCurrCoordsY - radius;
-                graph.FillEllipse(redBrush,
-                                (int)upperLeftCurrCoordsX,
-                                (int)upperLeftCurrCoordsY,
-                                (float)(2.0 * radius),
-                                (float)(2.0 * radius));
-            }
+            // these will draw the ellipse of OUR race track
+            // pen, x, y, width, height
+            /*
+              If width = height → it’s a circle
+              If width > height → it’s wide / stretched sideways
+              If width < height → it’s tall / stretched vertically
+            */
+            // hardcoding
+            graph.DrawEllipse(ellipseTrack, (this.ClientSize.Width/2 - 600), (ballHeight/2 - 250), 1200, 500);
+            /*
+            // a = 600, b = 250
+            The equation of an ellipse is a pair: x(t) = a*cos(t)  and y(t) = b*sin(t)
+            Here ‘a’ is a major radius and ‘b’ is a minor radius.  For example, a =420.0 and b = 350.0.
+            DrawEllipse(blackpen,500,400,840,700)
+            The 840 is 2 times the major radius and the 700 is 2 times the minor radius.
+            */
+
+            upperLeftCurrCoordsX = centerCurrCoordsX - radius;
+            upperLeftCurrCoordsY = centerCurrCoordsY - radius;
+            graph.FillEllipse(redBrush,
+                            (int)upperLeftCurrCoordsX,
+                            (int)upperLeftCurrCoordsY,
+                            (float)(2.0 * radius),
+                            (float)(2.0 * radius));
 
             base.OnPaint(artsy);
         }
