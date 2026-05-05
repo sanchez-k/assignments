@@ -140,7 +140,7 @@ public class EllipseProgram : Form {
         // Now the rest of the labels & textboxes
         initSpeed.Size = new Size(360, 45);
         initSpeed.Location = new Point(go.Left, titleHeight + ballHeight + 15);
-        initSpeed.Text = "Enter initial curve pix/sec";
+        initSpeed.Text = "Enter initial speed pix/sec";
         initSpeed.TextAlign = ContentAlignment.MiddleCenter;
         initSpeed.Font = new Font("Georgia", 20, FontStyle.Bold);
         initSpeed.BackColor = ColorTranslator.FromHtml("#CF8969");
@@ -175,7 +175,7 @@ public class EllipseProgram : Form {
 
         currSpeed.Size = new Size(310, 45);
         currSpeed.Location = new Point(coords.Right + objMargin, initSpeed.Top);
-        currSpeed.Text = "Current curve pix/sec";
+        currSpeed.Text = "Current speed pix/sec";
         currSpeed.TextAlign = ContentAlignment.MiddleCenter;
         currSpeed.Font = new Font("Georgia", 20, FontStyle.Bold);
         currSpeed.BackColor = ColorTranslator.FromHtml("#CF8969");
